@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}Match Prediction - Print View{% endblock %}
+
+{% block head %}
+<!-- Include jsPDF library for client-side PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+    /* Print-specific styles */
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        body {
+            font-size: 12px;
+        }
+        .container {
+            width: 100%;
+            max-width: 100%;
+        }
+        .card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+        .card-header {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+        }
+        .red-alliance .card-header {
+            background-color: #ffdddd !important;
+            color: #dc3545 !important;
+        }
+        .blue-alliance .card-header {
+            background-color: #dde5ff !important;
+            color: #0d6efd !important;
+        }
+        a {
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .prediction-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    }
+    
+    /* General styles */
+    .print-container {
+        padding: 20px;
+    }
+    .page-header {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .prediction-header {
+        text-align: center;
+        margin: 20px 0;
+    }
+    .pdf-actions {
+        margin: 20px 0;
+        text-align: center;
+    }
+    .winner-red {
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.5);
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .winner-blue {
+        background-color: rgba(13, 110, 253, 0.1);
+        border: 1px solid rgba(13, 110, 253, 0.5);
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .red-alliance .card-header {
+        background-color: #dc3545;
+        color: white;
+    }
+    .blue-alliance .card-header {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .confidence-bar {
+        height: 20px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+    .confidence-bar-inner {
+        height: 100%;
+        text-align: center;
+        line-height: 20px;
+        color: white;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+    .confidence-high {
+        background-color: #28a745;
+    }
+    .confidence-medium {
+        background-color: #17a2b8;
+    }
+    .confidence-low {
+        background-color: #ffc107;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+        font-size: 0.8em;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="print-container">
+    <div class="pdf-actions no-print">
+        <div class="alert alert-info">
+            <h5>Print/PDF Instructions:</h5>
+            <p>Use one of these methods to save this prediction:</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-primary" id="generate-pdf">
+                    <i class="fas fa-file-pdf me-1"></i> Download as PDF
+                </button>
+                <button class="btn btn-secondary" onclick="window.print();">
+                    <i class="fas fa-print me-1"></i> Print This Page
+                </button>
+                <a href="{{ url_for('matches.predict', event_id=selected_event.id, match_id=selected_match.id) }}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Prediction
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="printable-content">
+        <div class="page-header">
+            <h1>Match Prediction Report</h1>
+            <div>Team 5454 Scouting App</div>
+        </div>
+        
+        <div class="prediction-header">
+            <h2>{{ selected_match.match_type }} {{ selected_match.match_number }}</h2>
+            <h3>{{ selected_event.name }} ({{ selected_event.year }})</h3>
+            <p>Generated on: {{ now.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+        
+        <div class="winner-{{ prediction.predicted_winner }}">
+            <h2 class="text-center">Predicted Winner: {{ prediction.predicted_winner|upper }} ALLIANCE</h2>
+            <p class="text-center">Predicted Score: <strong>Red {{ prediction.red_alliance.predicted_score }} - Blue {{ prediction.blue_alliance.predicted_score }}</strong></p>
+            
+            <div class="text-center">Confidence: {{ (prediction.confidence * 100)|round }}%</div>
+            <div class="confidence-bar">
+                <div class="confidence-bar-inner 
+                    {% if prediction.confidence < 0.3 %}confidence-low{% elif prediction.confidence > 0.7 %}confidence-high{% else %}confidence-medium{% endif %}" 
+                    style="width: {{ (prediction.confidence * 100)|round }}%;">
+                    {{ (prediction.confidence * 100)|round }}%
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <!-- RED ALLIANCE -->
+            <div class="col-md-6 mb-4">
+                <div class="card red-alliance">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">Red Alliance</h3>
+                        <span class="badge bg-light text-danger">{{ prediction.red_alliance.predicted_score }} pts</span>
+                    </div>
+                    <div class="card-body">
+                        {% if prediction.red_alliance.teams %}
+                            {% for team_data in prediction.red_alliance.teams %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h4 class="h6 mb-0">
+                                        {{ team_data.team.team_number }} - {{ team_data.team.team_name }}
+                                    </h4>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="row row-cols-2 row-cols-md-3 g-2">
+                                        <div class="col">
+                                            <div class="small fw-bold">Auto</div>
+                                            <div>{{ team_data.metrics.get('auto_points', 0)|round(1) }} pts</div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="small fw-bold">Teleop</div>
+                                            <div>{{ team_data.metrics.get('teleop_points', 0)|round(1) }} pts</div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="small fw-bold">Endgame</div>
+                                            <div>{{ team_data.metrics.get('endgame_points', 0)|round(1) }} pts</div>
+                                        </div>
+                                        
+                                        <!-- Display other relevant metrics -->
+                                        {% if game_config and game_config.get('data_analysis') and game_config.get('data_analysis').get('key_metrics') %}
+                                            {% for metric in game_config.data_analysis.key_metrics %}
+                                                {% if metric.id not in ['auto_points', 'teleop_points', 'endgame_points'] and metric.display_in_predictions %}
+                                                <div class="col">
+                                                    <div class="small fw-bold">{{ metric.name }}</div>
+                                                    {% if metric.id == 'endgame_capability' %}
+                                                        {% if team_data.metrics.get('endgame_position_name') %}
+                                                            {% set position = team_data.metrics.get('endgame_position_name') %}
+                                                            <div>{{ position }}</div>
+                                                        {% else %}
+                                                            <div>None</div>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <div>{{ team_data.metrics.get(metric.id, 0)|round(2) }}</div>
+                                                    {% endif %}
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                No scouting data available for red alliance teams
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BLUE ALLIANCE -->
+            <div class="col-md-6 mb-4">
+                <div class="card blue-alliance">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">Blue Alliance</h3>
+                        <span class="badge bg-light text-primary">{{ prediction.blue_alliance.predicted_score }} pts</span>
+                    </div>
+                    <div class="card-body">
+                        {% if prediction.blue_alliance.teams %}
+                            {% for team_data in prediction.blue_alliance.teams %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h4 class="h6 mb-0">
+                                        {{ team_data.team.team_number }} - {{ team_data.team.team_name }}
+                                    </h4>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="row row-cols-2 row-cols-md-3 g-2">
+                                        <div class="col">
+                                            <div class="small fw-bold">Auto</div>
+                                            <div>{{ team_data.metrics.get('auto_points', 0)|round(1) }} pts</div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="small fw-bold">Teleop</div>
+                                            <div>{{ team_data.metrics.get('teleop_points', 0)|round(1) }} pts</div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="small fw-bold">Endgame</div>
+                                            <div>{{ team_data.metrics.get('endgame_points', 0)|round(1) }} pts</div>
+                                        </div>
+                                        
+                                        <!-- Display other relevant metrics -->
+                                        {% if game_config and game_config.get('data_analysis') and game_config.get('data_analysis').get('key_metrics') %}
+                                            {% for metric in game_config.data_analysis.key_metrics %}
+                                                {% if metric.id not in ['auto_points', 'teleop_points', 'endgame_points'] and metric.display_in_predictions %}
+                                                <div class="col">
+                                                    <div class="small fw-bold">{{ metric.name }}</div>
+                                                    {% if metric.id == 'endgame_capability' %}
+                                                        {% if team_data.metrics.get('endgame_position_name') %}
+                                                            {% set position = team_data.metrics.get('endgame_position_name') %}
+                                                            <div>{{ position }}</div>
+                                                        {% else %}
+                                                            <div>None</div>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <div>{{ team_data.metrics.get(metric.id, 0)|round(2) }}</div>
+                                                    {% endif %}
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                No scouting data available for blue alliance teams
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Generated by Team 5454 Scouting App</p>
+            <p>Confidential - For Team Use Only</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup PDF generation button
+        document.getElementById('generate-pdf').addEventListener('click', function() {
+            // Show loading state
+            const button = this;
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating PDF...';
+            
+            // Hide buttons during capture
+            document.querySelector('.pdf-actions').style.display = 'none';
+            
+            // Use html2canvas to capture the content
+            html2canvas(document.getElementById('printable-content'), {
+                scale: 2, // Higher scale for better quality
+                useCORS: true,
+                logging: false,
+                allowTaint: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                // Get the canvas dimensions
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                
+                // Initialize jsPDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Add the image to the PDF
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                // Generate filename
+                const matchType = '{{ selected_match.match_type }}';
+                const matchNumber = '{{ selected_match.match_number }}';
+                const eventCode = '{{ selected_event.code }}';
+                const filename = `Match_Prediction_${eventCode}_${matchType}_${matchNumber}.pdf`;
+                
+                // Save the PDF
+                pdf.save(filename);
+                
+                // Restore the button and show actions again
+                document.querySelector('.pdf-actions').style.display = 'block';
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
+        });
+    });
+</script>
+{% endblock %}
