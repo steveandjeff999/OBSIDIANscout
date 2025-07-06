@@ -88,11 +88,38 @@
                         </li>
                         {% endif %}
                         
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint and request.endpoint.startswith('scouting') %}active{% endif %}" 
-                               href="{{ url_for('scouting.index') }}">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if request.endpoint and request.endpoint.startswith('scouting') %}active{% endif %}" 
+                               href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-clipboard-list nav-icon"></i> Scouting
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-animated shadow-sm">
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'scouting.index' %}active{% endif %}" 
+                                       href="{{ url_for('scouting.index') }}">
+                                        <i class="fas fa-home nav-icon text-primary"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'scouting.scouting_form' %}active{% endif %}" 
+                                       href="{{ url_for('scouting.scouting_form') }}">
+                                        <i class="fas fa-rocket nav-icon text-success"></i> Start Scouting
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'scouting.list_data' %}active{% endif %}" 
+                                       href="{{ url_for('scouting.list_data') }}">
+                                        <i class="fas fa-list nav-icon text-info"></i> All Scouting Data
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'scouting.view_text_elements' %}active{% endif %}" 
+                                       href="{{ url_for('scouting.view_text_elements') }}">
+                                        <i class="fas fa-comment-alt nav-icon text-warning"></i> Text Elements
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         
                         {% if user_has_role('admin') or user_has_role('analytics') %}

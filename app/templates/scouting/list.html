@@ -119,9 +119,14 @@
     <div class="card-footer bg-light">
         <div class="d-flex justify-content-between align-items-center">
             <span>Total records: {{ scouting_data|length }}</span>
-            <a href="{{ url_for('data.export_excel') }}" class="btn btn-success">
-                <i class="fas fa-file-excel me-2"></i> Export to Excel
-            </a>
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('scouting.view_text_elements') }}" class="btn btn-outline-info">
+                    <i class="fas fa-comment-alt me-2"></i> View Text Elements
+                </a>
+                <a href="{{ url_for('data.export_excel') }}" class="btn btn-success">
+                    <i class="fas fa-file-excel me-2"></i> Export to Excel
+                </a>
+            </div>
         </div>
     </div>
     {% endif %}

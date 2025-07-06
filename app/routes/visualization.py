@@ -174,11 +174,11 @@ def compare_teams():
         if current_event_code:
             current_event = Event.query.filter_by(code=current_event_code).first()
         
-        # Get teams filtered by the current event if available
+        # Get teams filtered by the current event if available, otherwise show all teams
         if current_event:
             teams = current_event.teams
         else:
-            teams = []  # No teams if no current event is set
+            teams = Team.query.order_by(Team.team_number).all()  # Show all teams if no current event is set
         
         metrics = game_config['data_analysis']['key_metrics']
         return render_template('visualization/compare_form.html', teams=teams, metrics=metrics)
@@ -202,16 +202,31 @@ def compare_teams():
     
     # Calculate metrics for each team
     team_metrics = []
+    teams_with_data = []
+    teams_without_data = []
     
     for team in teams:
         scouting_data = ScoutingData.query.filter_by(team_id=team.id).all()
+        
+        if not scouting_data:
+            # Include teams without data with 0 values
+            teams_without_data.append(team)
+            team_metrics.append({
+                'team': team.team_number,
+                'team_name': team.team_name,
+                'aggregate_value': 0,
+                'match_values': [],
+                'has_data': False
+            })
+            continue
         
         # Calculate metric for each match
         match_values = []
         for data in scouting_data:
             try:
                 match_num = data.match.match_number
-                value = data.calculate_metric(metric_config['formula'])
+                # Use the metric ID instead of the formula for auto-generated metrics
+                value = data.calculate_metric(metric_config['id'])
                 match_values.append({
                     'team': team.team_number,
                     'team_name': team.team_name,
@@ -237,17 +252,29 @@ def compare_teams():
             'team': team.team_number,
             'team_name': team.team_name,
             'aggregate_value': aggregate_value,
-            'match_values': match_values
+            'match_values': match_values,
+            'has_data': True
         })
+        teams_with_data.append(team)
     
     # Generate comparison plots
     plots = {}
     
     # Bar chart comparing aggregate values
-    bar_data = [{
-        'team': f"{tm['team']} - {tm['team_name']}", 
-        'value': tm['aggregate_value']
-    } for tm in team_metrics]
+    bar_data = []
+    colors = []
+    for tm in team_metrics:
+        team_label = f"{tm['team']} - {tm['team_name']}"
+        bar_data.append({
+            'team': team_label,
+            'value': tm['aggregate_value'],
+            'has_data': tm.get('has_data', True)
+        })
+        # Use different colors for teams with/without data
+        if tm.get('has_data', True):
+            colors.append('#1f77b4')  # Blue for teams with data
+        else:
+            colors.append('#ff7f0e')  # Orange for teams without data
     
     df_bar = pd.DataFrame(bar_data)
     if not df_bar.empty:
@@ -257,7 +284,9 @@ def compare_teams():
             x='team',
             y='value',
             title=f"Team Comparison: {metric_config['name']}",
-            labels={'team': 'Team', 'value': metric_config['name']}
+            labels={'team': 'Team', 'value': metric_config['name']},
+            color='has_data',
+            color_discrete_map={True: '#1f77b4', False: '#ff7f0e'}
         )
         
         # Update layout for better appearance
@@ -266,8 +295,19 @@ def compare_teams():
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             font=dict(family="Arial, sans-serif"),
-            xaxis=dict(tickangle=-45)  # Rotate labels for better readability
+            xaxis=dict(tickangle=-45),  # Rotate labels for better readability
+            legend=dict(
+                title="Data Status",
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
         )
+        
+        # Update legend labels
+        fig_bar.for_each_trace(lambda t: t.update(name = "With Data" if t.name == "True" else "No Data"))
         
         # Serialize directly to a compatible JSON format
         plot_json = {
@@ -278,15 +318,16 @@ def compare_teams():
         # Use the built-in plotly serializer
         plots['comparison_bar'] = json.dumps(plot_json, cls=plotly.utils.PlotlyJSONEncoder)
     
-    # Line chart comparing match trends
+    # Line chart comparing match trends (only for teams with data)
     line_data = []
     for tm in team_metrics:
-        for mv in tm['match_values']:
-            line_data.append({
-                'team': f"{tm['team']} - {tm['team_name']}",
-                'match': mv['match'],
-                'value': mv['value']
-            })
+        if tm.get('has_data', True):  # Only include teams with data
+            for mv in tm['match_values']:
+                line_data.append({
+                    'team': f"{tm['team']} - {tm['team_name']}",
+                    'match': mv['match'],
+                    'value': mv['value']
+                })
     
     df_line = pd.DataFrame(line_data)
     if not df_line.empty:
@@ -296,7 +337,7 @@ def compare_teams():
             x='match',
             y='value',
             color='team',
-            title=f"Match Trend Comparison: {metric_config['name']}",
+            title=f"Match Trend Comparison: {metric_config['name']} (Teams with Data Only)",
             labels={'match': 'Match Number', 'value': metric_config['name'], 'team': 'Team'},
             markers=True  # Add markers for better readability
         )
@@ -327,6 +368,8 @@ def compare_teams():
     
     return render_template('visualization/compare.html',
                          teams=teams,
+                         teams_with_data=teams_with_data,
+                         teams_without_data=teams_without_data,
                          metric=metric_config,
                          team_metrics=team_metrics,
                          plots=plots)

@@ -15,6 +15,16 @@
                         {% if metric.formula %}
                         <p class="text-muted mb-0">Formula: {{ metric.formula }}</p>
                         {% endif %}
+                        {% if teams_without_data %}
+                        <div class="alert alert-info mt-2 mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Teams without data:</strong> The following teams are included in the comparison but have no scouting data:
+                            {% for team in teams_without_data %}
+                                <span class="badge bg-warning text-dark me-1">{{ team.team_number }}</span>
+                            {% endfor %}
+                            <br><small class="text-muted">Teams without data will show as 0 in the charts and are highlighted in orange.</small>
+                        </div>
+                        {% endif %}
                     </div>
                     <div>
                         <a href="{{ url_for('visualization.index') }}" class="btn btn-outline-secondary">
@@ -87,8 +97,13 @@
                         </thead>
                         <tbody>
                             {% for tm in team_metrics|sort(attribute='aggregate_value', reverse=True) %}
-                            <tr>
-                                <td>{{ tm.team }} - {{ tm.team_name }}</td>
+                            <tr {% if not tm.get('has_data', True) %}class="table-secondary"{% endif %}>
+                                <td>
+                                    {{ tm.team }} - {{ tm.team_name }}
+                                    {% if not tm.get('has_data', True) %}
+                                    <span class="badge bg-warning text-dark ms-2">No Data</span>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {% if 'percentage' in metric.id %}
                                         {{ "%.1f"|format(tm.aggregate_value) }}%

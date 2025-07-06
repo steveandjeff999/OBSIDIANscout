@@ -296,51 +296,6 @@ class ScoutingData(db.Model):
         except Exception as e:
             print(f"ERROR calculating metric with formula '{formula}': {str(e)}")
             return 0
-        
-        # Create a safer formula evaluation
-        try:
-            # Get the game configuration to identify available fields
-            game_config = current_app.config.get('GAME_CONFIG', {})
-            
-            # Initialize local dictionary with default values based on the game configuration
-            local_dict = self._initialize_data_dict(game_config)
-            
-            # Add all data fields from the actual scouting data
-            id_map = get_id_to_perm_id_mapping()
-            for key, value in data.items():
-                perm_id = id_map.get(key, key) # Use perm_id if available
-                # For boolean fields that might be stored as string, ensure they're actual booleans
-                if isinstance(value, str) and value.lower() in ['true', 'false']:
-                    local_dict[perm_id] = value.lower() == 'true'
-                # Keep booleans as booleans
-                elif isinstance(value, bool):
-                    local_dict[perm_id] = value
-                # Convert numeric strings to numbers
-                elif isinstance(value, str) and value.replace('.', '', 1).isdigit():
-                    local_dict[perm_id] = float(value)
-                # Everything else, keep as is
-                else:
-                    local_dict[perm_id] = value
-            
-            # Check if this is a known metric with specific handling
-            metric_id = self._find_metric_id_by_formula(formula, game_config)
-            if metric_id:
-                # Call the appropriate handler method for this metric
-                return self._calculate_specific_metric(metric_id, formula, local_dict)
-            
-            # For other formulas or if specific handler not found, use general evaluation
-            id_map = get_id_to_perm_id_mapping()
-            id_to_perm_id = {v: k for k, v in id_map.items()}
-            
-            # Replace all occurrences of perm_id with id in the formula
-            for perm_id, id_val in id_to_perm_id.items():
-                formula = formula.replace(id_val, perm_id)
-
-            return self._evaluate_formula(formula, local_dict)
-            
-        except Exception as e:
-            print(f"ERROR calculating metric with formula '{formula}': {str(e)}")
-            return 0
     
     def _initialize_data_dict(self, game_config):
         """Initialize data dictionary with default values based on the game configuration"""

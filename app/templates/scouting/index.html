@@ -111,9 +111,14 @@
                 {% endif %}
                 
                 <div class="text-center mt-3">
-                    <a href="{{ url_for('scouting.list_data') }}" class="btn {% if current_user.has_role('scout') and not current_user.has_role('analytics') and not current_user.has_role('admin') %}btn-outline-secondary disabled{% else %}btn-outline-primary{% endif %}">
-                        <i class="fas fa-list me-2"></i> View All Scouting Data
-                    </a>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{{ url_for('scouting.list_data') }}" class="btn {% if current_user.has_role('scout') and not current_user.has_role('analytics') and not current_user.has_role('admin') %}btn-outline-secondary disabled{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas fa-list me-2"></i> View All Scouting Data
+                        </a>
+                        <a href="{{ url_for('scouting.view_text_elements') }}" class="btn btn-outline-info">
+                            <i class="fas fa-comment-alt me-2"></i> View Text Elements
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

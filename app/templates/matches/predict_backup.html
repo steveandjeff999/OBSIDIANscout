@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Match Prediction{% endblock %}
 
@@ -117,7 +117,7 @@
                                                                 {% if endgame_element.id in metric.formula %}
                                                                     {% set is_endgame_metric = true %}
                                                                     {% set endgame_element_id = endgame_element.id %}
-                                                                    
+                                                                    {% break %}
                                                                 {% endif %}
                                                             {% endfor %}
                                                         {% endif %}
@@ -142,7 +142,7 @@
                                                                     {% else %}
                                                                         <div class="text-muted">{{ endgame_element.get('default', 'None') }}</div>
                                                                     {% endif %}
-                                                                    
+                                                                    {% break %}
                                                                 {% endif %}
                                                             {% endfor %}
                                                         {% else %}
@@ -216,7 +216,7 @@
                                                                 {% if endgame_element.id in metric.formula %}
                                                                     {% set is_endgame_metric = true %}
                                                                     {% set endgame_element_id = endgame_element.id %}
-                                                                    
+                                                                    {% break %}
                                                                 {% endif %}
                                                             {% endfor %}
                                                         {% endif %}
@@ -241,7 +241,7 @@
                                                                     {% else %}
                                                                         <div class="text-muted">{{ endgame_element.get('default', 'None') }}</div>
                                                                     {% endif %}
-                                                                    
+                                                                    {% break %}
                                                                 {% endif %}
                                                             {% endfor %}
                                                         {% else %}

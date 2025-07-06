@@ -829,3 +829,71 @@ def api_save():
             'success': False,
             'message': str(e)
         })
+
+@bp.route('/text-elements')
+@login_required
+def view_text_elements():
+    """View all submitted text elements across all scouting data"""
+    # Get game configuration to identify text elements
+    game_config = current_app.config['GAME_CONFIG']
+    
+    # Get current event based on configuration
+    current_event_code = game_config.get('current_event_code')
+    current_event = None
+    if current_event_code:
+        current_event = Event.query.filter_by(code=current_event_code).first()
+    
+    # Get all text elements from configuration
+    text_elements = game_config.get('post_match', {}).get('text_elements', [])
+    
+    if not text_elements:
+        flash('No text elements are configured in the game configuration.', 'info')
+        return redirect(url_for('scouting.index'))
+    
+    # Get scouting data with text elements
+    query = (ScoutingData.query
+             .join(Match)
+             .join(Event)
+             .join(Team)
+             .order_by(ScoutingData.timestamp.desc()))
+    
+    # Filter by current event if available
+    if current_event:
+        query = query.filter(Event.id == current_event.id)
+    
+    all_scouting_data = query.all()
+    
+    # Filter out entries that have text data
+    scouting_entries_with_text = []
+    for entry in all_scouting_data:
+        has_text_data = False
+        text_data = {}
+        
+        for element in text_elements:
+            element_id = element.get('id')
+            if element_id and entry.data.get(element_id):
+                value = entry.data.get(element_id, '').strip()
+                if value:  # Only include non-empty text
+                    text_data[element_id] = value
+                    has_text_data = True
+        
+        if has_text_data:
+            scouting_entries_with_text.append({
+                'entry': entry,
+                'text_data': text_data
+            })
+    
+    # Get all events that have scouting data for the filter
+    events = (Event.query
+             .join(Match)
+             .join(ScoutingData)
+             .distinct()
+             .order_by(Event.name)
+             .all())
+    
+    return render_template('scouting/text_elements.html',
+                         scouting_entries=scouting_entries_with_text,
+                         text_elements=text_elements,
+                         events=events,
+                         current_event=current_event,
+                         game_config=game_config)

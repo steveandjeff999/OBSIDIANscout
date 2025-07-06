@@ -1,6 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.urls import url_parse
+try:
+    from werkzeug.urls import url_parse
+except ImportError:
+    # For newer versions of Werkzeug (>= 2.0)
+    from urllib.parse import urlparse as url_parse
 from functools import wraps
 from app import db
 from app.models import User, Role
