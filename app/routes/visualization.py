@@ -478,3 +478,111 @@ def event_stats(event_id):
                          team_rankings=team_rankings,
                          plots=plots,
                          game_config=game_config)
+
+@bp.route('/side-by-side')
+def side_by_side():
+    """Side-by-side team comparison page"""
+    team_numbers = request.args.getlist('teams', type=int)
+    
+    if not team_numbers:
+        # Get game configuration
+        game_config = current_app.config['GAME_CONFIG']
+        
+        # Get current event based on configuration
+        current_event_code = game_config.get('current_event_code')
+        current_event = None
+        if current_event_code:
+            current_event = Event.query.filter_by(code=current_event_code).first()
+        
+        # Get teams filtered by the current event if available, otherwise show all teams
+        if current_event:
+            teams = current_event.teams
+        else:
+            teams = Team.query.order_by(Team.team_number).all()
+        
+        metrics = game_config['data_analysis']['key_metrics']
+        return render_template('visualization/side_by_side_form.html', teams=teams, metrics=metrics)
+    
+    # Get game configuration
+    game_config = current_app.config['GAME_CONFIG']
+    
+    # Get teams
+    teams = Team.query.filter(Team.team_number.in_(team_numbers)).all()
+    
+    # Calculate detailed metrics for each team
+    teams_data = []
+    
+    for team in teams:
+        scouting_data = ScoutingData.query.filter_by(team_id=team.id).all()
+        
+        team_info = {
+            'team': team,
+            'metrics': {},
+            'match_count': len(scouting_data),
+            'has_data': len(scouting_data) > 0
+        }
+        
+        if scouting_data:
+            # Calculate each metric
+            for metric in game_config['data_analysis']['key_metrics']:
+                metric_id = metric['id']
+                match_values = []
+                
+                for data in scouting_data:
+                    try:
+                        value = data.calculate_metric(metric_id)
+                        match_values.append({
+                            'match': data.match.match_number,
+                            'value': value
+                        })
+                    except Exception as e:
+                        print(f"Error calculating metric {metric_id} for team {team.team_number}: {e}")
+                
+                if match_values:
+                    values = [x['value'] for x in match_values]
+                    
+                    # Calculate aggregate based on metric configuration
+                    if metric.get('aggregate') == 'average':
+                        aggregate_value = sum(values) / len(values)
+                    elif metric.get('aggregate') == 'percentage':
+                        aggregate_value = (sum(values) / len(values)) * 100
+                    else:
+                        aggregate_value = sum(values)
+                    
+                    team_info['metrics'][metric_id] = {
+                        'config': metric,
+                        'aggregate': aggregate_value,
+                        'match_data': values,
+                        'match_values': match_values,
+                        'min': min(values),
+                        'max': max(values),
+                        'avg': sum(values) / len(values)
+                    }
+                else:
+                    team_info['metrics'][metric_id] = {
+                        'config': metric,
+                        'aggregate': 0,
+                        'match_data': [],
+                        'match_values': [],
+                        'min': 0,
+                        'max': 0,
+                        'avg': 0
+                    }
+        else:
+            # No data for this team
+            for metric in game_config['data_analysis']['key_metrics']:
+                team_info['metrics'][metric['id']] = {
+                    'config': metric,
+                    'aggregate': 0,
+                    'match_data': [],
+                    'match_values': [],
+                    'min': 0,
+                    'max': 0,
+                    'avg': 0
+                }
+        
+        teams_data.append(team_info)
+    
+    return render_template('visualization/side_by_side.html',
+                         teams_data=teams_data,
+                         game_config=game_config)

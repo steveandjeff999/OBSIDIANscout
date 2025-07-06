@@ -107,7 +107,7 @@ def create_app(test_config=None):
     config_manager.init_app(app)
 
     # Import and register blueprints
-    from app.routes import main, teams, matches, scouting, data, visualization, graphs, events, alliances, auth, activity, assistant, integrity
+    from app.routes import main, teams, matches, scouting, data, visualization, graphs, events, alliances, auth, activity, assistant, integrity, pit_scouting
     
     # Register template filters
     from app.utils import template_filters
@@ -117,6 +117,7 @@ def create_app(test_config=None):
     app.register_blueprint(teams.bp)
     app.register_blueprint(matches.bp)
     app.register_blueprint(scouting.bp)
+    app.register_blueprint(pit_scouting.bp)
     app.register_blueprint(data.bp)
     app.register_blueprint(visualization.bp)
     app.register_blueprint(graphs.bp)
@@ -127,9 +128,12 @@ def create_app(test_config=None):
     app.register_blueprint(assistant.bp)
     app.register_blueprint(integrity.integrity_bp)
     
-    # Create database tables
+    # Create database tables (only if they don't exist)
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            print(f"Warning: Database tables may already exist: {e}")
     
     # Error handlers
     @app.errorhandler(404)

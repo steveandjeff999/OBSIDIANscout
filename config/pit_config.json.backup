@@ -1,0 +1,40 @@
+{
+  "pit_scouting": {
+    "title": "Pit Scouting",
+    "description": "Collect detailed information about teams and their robots",
+    "sections": [
+      {
+        "id": "team_info",
+        "name": "Team Information",
+        "elements": [
+          {
+            "id": "team_number",
+            "perm_id": "team_number",
+            "name": "Team Number",
+            "type": "number",
+            "required": true,
+            "validation": {
+              "min": 1,
+              "max": 99999
+            }
+          }
+        ]
+      },
+      {
+        "id": "robot_design",
+        "name": "Robot Design",
+        "elements": []
+      },
+      {
+        "id": "game_capabilities",
+        "name": "Game Capabilities",
+        "elements": []
+      },
+      {
+        "id": "strategy_notes",
+        "name": "Strategy & Notes",
+        "elements": []
+      }
+    ]
+  }
+}

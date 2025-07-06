@@ -193,6 +193,53 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-columns me-2"></i> Side-by-Side Comparison</h5>
+            </div>
+            <div class="card-body">
+                <p>Compare teams side by side with detailed metrics in a tabular format</p>
+                
+                <form action="{{ url_for('visualization.side_by_side') }}" method="get">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-users me-2 text-warning"></i>Select Teams (2-6 teams)
+                        </label>
+                        <select class="form-select team-multi-select" id="side_by_side_teams" name="teams" multiple required>
+                            {% for team in teams %}
+                            <option value="{{ team.team_number }}" data-team-name="{{ team.team_name or 'Unknown' }}">
+                                {{ team.team_number }} - {{ team.team_name or 'Unknown' }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>Select 2-6 teams for detailed side-by-side comparison
+                            <span id="side-by-side-team-count-indicator" class="text-muted ms-2"></span>
+                        </div>
+                        
+                        <!-- Quick selection buttons -->
+                        <div class="mt-2">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-secondary" id="clear-side-by-side-teams">
+                                    <i class="fas fa-times me-1"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="fas fa-columns me-2"></i> Compare Side-by-Side
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Team-event mapping for dynamic filtering
@@ -407,6 +454,56 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show initial team count for comparison
     const totalComparisonTeams = $('#comparison_teams option[value!=""]').length;
     $('#comparison-team-count-indicator').text(`(${totalComparisonTeams} teams available)`);
+    
+    // Side-by-side team selection handlers
+    $('#side_by_side_teams').select2({
+        placeholder: 'Search and select teams...',
+        allowClear: true,
+        width: '100%',
+        templateResult: function(team) {
+            if (!team.id) return team.text;
+            
+            const teamNumber = team.text.split(' - ')[0];
+            const teamName = team.text.split(' - ')[1] || 'Unknown';
+            
+            return $('<span><strong>' + teamNumber + '</strong> - ' + teamName + '</span>');
+        },
+        templateSelection: function(team) {
+            if (!team.id) return team.text;
+            
+            const teamNumber = team.text.split(' - ')[0];
+            
+            if (window.innerWidth < 768) {
+                return teamNumber;
+            } else {
+                return team.text;
+            }
+        }
+    });
+    
+    // Handle side-by-side team count display
+    $('#side_by_side_teams').on('change', function() {
+        const selectedCount = $(this).val() ? $(this).val().length : 0;
+        $('#side-by-side-team-count-indicator').text(`(${selectedCount} selected)`);
+        
+        // Update submit button state
+        const submitBtn = $(this).closest('form').find('button[type="submit"]');
+        if (selectedCount < 2) {
+            submitBtn.prop('disabled', true).text('Select at least 2 teams');
+        } else if (selectedCount > 6) {
+            submitBtn.prop('disabled', true).text('Select no more than 6 teams');
+        } else {
+            submitBtn.prop('disabled', false).html('<i class="fas fa-columns me-2"></i> Compare Side-by-Side');
+        }
+    });
+    
+    $('#clear-side-by-side-teams').click(function() {
+        $('#side_by_side_teams').val(null).trigger('change');
+    });
+    
+    // Show initial team count for side-by-side
+    const totalSideBySideTeams = $('#side_by_side_teams option[value!=""]').length;
+    $('#side-by-side-team-count-indicator').text(`(0 selected)`);
 });
 
 function redirectToTeamStats(event) {

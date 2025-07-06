@@ -5,6 +5,7 @@ from app import create_app, socketio, db
 from flask import redirect, url_for, request, flash
 from sqlalchemy.exc import IntegrityError, OperationalError
 from app.models import User, Role
+from app.utils.database_init import initialize_database, check_database_health
 
 app = create_app()
 
@@ -13,9 +14,10 @@ app = create_app()
 def check_first_run():
     # File integrity is now always in warning-only mode - no redirection needed
     
+    # Check if database needs initialization
     if not User.query.first() and request.path != '/auth/login':
-        # No users exist, redirect to init
-        flash('Please run init_auth.py to set up the authentication system.', 'warning')
+        # No users exist, database needs initialization
+        flash('Database is being initialized. Please wait...', 'info')
         return redirect(url_for('auth.login'))
 
 # Custom error handler for database issues
@@ -34,6 +36,21 @@ def handle_operational_error(error):
     return redirect(url_for('main.index'))
 
 if __name__ == '__main__':
+    # Initialize database first
+    print("Starting FRC Scouting Platform...")
+    with app.app_context():
+        try:
+            # Check if database needs initialization
+            if not check_database_health():
+                print("Database needs initialization...")
+                initialize_database()
+            else:
+                print("Database is healthy and ready.")
+        except Exception as e:
+            print(f"Database initialization error: {e}")
+            print("Attempting to initialize database...")
+            initialize_database()
+    
     # Initialize file integrity monitoring
     print("Initializing file integrity monitoring...")
     if hasattr(app, 'file_integrity_monitor'):

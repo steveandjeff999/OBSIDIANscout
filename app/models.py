@@ -101,6 +101,8 @@ class User(UserMixin, db.Model):
             allowed_routes = [
                 'scouting.index', 'scouting.form', 'scouting.list', 
                 'scouting.view', 'scouting.qr', 'scouting.qr_scan', 'scouting.datamatrix',
+                'pit_scouting.index', 'pit_scouting.form', 'pit_scouting.list', 
+                'pit_scouting.view', 'pit_scouting.sync', 'pit_scouting.upload',
                 'auth.logout', 'auth.profile'
             ]
             return route_name in allowed_routes
@@ -717,3 +719,87 @@ class AllianceSelection(db.Model):
         if self.third_pick_team:
             teams.append(self.third_pick_team)
         return teams
+
+class PitScoutingData(db.Model):
+    """Model to store pit scouting data with local storage and upload capability"""
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=True)
+    scout_name = db.Column(db.String(50), nullable=False)
+    scout_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    data_json = db.Column(db.Text, nullable=False)  # JSON data based on pit config
+    
+    # Local storage and sync fields
+    local_id = db.Column(db.String(36), unique=True, nullable=False)  # UUID for local storage
+    is_uploaded = db.Column(db.Boolean, default=False)
+    upload_timestamp = db.Column(db.DateTime, nullable=True)
+    device_id = db.Column(db.String(100), nullable=True)  # To track which device created the data
+    
+    # Relationships
+    team = db.relationship('Team', backref=db.backref('pit_scouting_data', lazy=True))
+    event = db.relationship('Event', backref=db.backref('pit_scouting_data', lazy=True))
+    scout = db.relationship('User', backref=db.backref('pit_scouting_data', lazy=True))
+    
+    def __repr__(self):
+        return f"<PitScoutingData Team {self.team.team_number} by {self.scout_name}>"
+    
+    @property
+    def data(self):
+        """Get data as a Python dictionary"""
+        try:
+            return json.loads(self.data_json)
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    
+    @data.setter
+    def data(self, value):
+        """Set data from a Python dictionary"""
+        self.data_json = json.dumps(value)
+    
+    def to_dict(self):
+        """Convert to dictionary for JSON serialization"""
+        return {
+            'id': self.id,
+            'local_id': self.local_id,
+            'team_id': self.team_id,
+            'team_number': self.team.team_number if self.team else None,
+            'event_id': self.event_id,
+            'scout_name': self.scout_name,
+            'scout_id': self.scout_id,
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+            'data': self.data,
+            'is_uploaded': self.is_uploaded,
+            'upload_timestamp': self.upload_timestamp.isoformat() if self.upload_timestamp else None,
+            'device_id': self.device_id
+        }
+    
+    @classmethod
+    def from_dict(cls, data_dict):
+        """Create instance from dictionary"""
+        pit_data = cls(
+            local_id=data_dict.get('local_id'),
+            team_id=data_dict.get('team_id'),
+            event_id=data_dict.get('event_id'),
+            scout_name=data_dict.get('scout_name'),
+            scout_id=data_dict.get('scout_id'),
+            data_json=json.dumps(data_dict.get('data', {})),
+            is_uploaded=data_dict.get('is_uploaded', False),
+            device_id=data_dict.get('device_id')
+        )
+        
+        # Handle timestamp
+        if data_dict.get('timestamp'):
+            if isinstance(data_dict['timestamp'], str):
+                pit_data.timestamp = datetime.fromisoformat(data_dict['timestamp'].replace('Z', '+00:00'))
+            else:
+                pit_data.timestamp = data_dict['timestamp']
+        
+        # Handle upload timestamp
+        if data_dict.get('upload_timestamp'):
+            if isinstance(data_dict['upload_timestamp'], str):
+                pit_data.upload_timestamp = datetime.fromisoformat(data_dict['upload_timestamp'].replace('Z', '+00:00'))
+            else:
+                pit_data.upload_timestamp = data_dict['upload_timestamp']
+        
+        return pit_data

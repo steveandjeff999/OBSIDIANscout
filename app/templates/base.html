@@ -106,6 +106,12 @@
                                         <i class="fas fa-rocket nav-icon text-success"></i> Start Scouting
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item {% if request.endpoint == 'pit_scouting.index' %}active{% endif %}" 
+                                       href="{{ url_for('pit_scouting.index') }}">
+                                        <i class="fas fa-wrench nav-icon text-primary"></i> Pit Scouting
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item {% if request.endpoint == 'scouting.list_data' %}active{% endif %}" 

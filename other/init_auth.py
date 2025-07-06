@@ -4,6 +4,12 @@ Database initialization script for authentication system.
 Creates roles and the initial admin user.
 """
 
+import sys
+import os
+
+# Add the parent directory to the Python path so we can import from app
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app import create_app, db
 from app.models import User, Role
 
