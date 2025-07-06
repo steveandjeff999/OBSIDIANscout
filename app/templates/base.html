@@ -30,14 +30,14 @@
 </head>
 <body class="d-flex flex-column h-100">
     <header class="app-header">
-        <nav class="navbar navbar-expand-lg shadow-sm">
-            <div class="container-fluid px-md-4">
+        <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+            <div class="container-fluid px-lg-4 px-md-3 px-2">
                 <a class="navbar-brand d-flex align-items-center" href="{% if user_has_role('scout') and not user_has_role('admin') and not user_has_role('analytics') %}{{ url_for('scouting.index') }}{% else %}{{ url_for('main.index') }}{% endif %}">
                     <i class="fas fa-robot brand-icon me-2"></i>
-                    <span class="brand-text fw-bold">5454 <span class="text-primary">Scout</span> {{ game_config.season }}</span>
+                    <span class="brand-text fw-bold">5454 <span class="text-primary">Scout</span> <span class="d-none d-sm-inline">{{ game_config.season }}</span></span>
                 </a>
                 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
                         aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -47,41 +47,47 @@
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         {% if not (user_has_role('scout') and not user_has_role('admin') and not user_has_role('analytics')) %}
                         <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
-                                <i class="fas fa-home nav-icon"></i> Dashboard
+                            <a class="nav-link px-3 py-2 {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
+                                <i class="fas fa-home nav-icon"></i> 
+                                <span class="nav-text">Dashboard</span>
                             </a>
                         </li>
                         {% endif %}
                         
                         {% if user_has_role('admin') or user_has_role('analytics') %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if request.endpoint and (request.endpoint.startswith('teams') or request.endpoint.startswith('matches') or request.endpoint.startswith('alliances')) %}active{% endif %}" 
+                            <a class="nav-link dropdown-toggle px-3 py-2 {% if request.endpoint and (request.endpoint.startswith('teams') or request.endpoint.startswith('matches') or request.endpoint.startswith('alliances')) %}active{% endif %}" 
                                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-trophy nav-icon"></i> Competition
+                                <i class="fas fa-trophy nav-icon"></i> 
+                                <span class="nav-text">Competition</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-animated shadow-sm">
+                            <ul class="dropdown-menu dropdown-menu-animated shadow">
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith('teams') %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint and request.endpoint.startswith('teams') %}active{% endif %}" 
                                        href="{{ url_for('teams.index') }}">
-                                        <i class="fas fa-users nav-icon text-primary"></i> Teams
+                                        <i class="fas fa-users nav-icon text-primary"></i> 
+                                        <span>Teams</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith('matches') %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint and request.endpoint.startswith('matches') %}active{% endif %}" 
                                        href="{{ url_for('matches.index') }}">
-                                        <i class="fas fa-gamepad nav-icon text-danger"></i> Matches
+                                        <i class="fas fa-gamepad nav-icon text-danger"></i> 
+                                        <span>Matches</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith('alliances') %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint and request.endpoint.startswith('alliances') %}active{% endif %}" 
                                        href="{{ url_for('alliances.index') }}">
-                                        <i class="fas fa-handshake nav-icon text-success"></i> Alliance Selection
+                                        <i class="fas fa-handshake nav-icon text-success"></i> 
+                                        <span>Alliance Selection</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint and request.endpoint == 'matches.predict' %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint and request.endpoint == 'matches.predict' %}active{% endif %}" 
                                        href="{{ url_for('matches.predict') }}">
-                                        <i class="fas fa-chart-line nav-icon text-warning"></i> Match Predictions
+                                        <i class="fas fa-chart-line nav-icon text-warning"></i> 
+                                        <span>Match Predictions</span>
                                     </a>
                                 </li>
                             </ul>
@@ -89,40 +95,46 @@
                         {% endif %}
                         
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if request.endpoint and request.endpoint.startswith('scouting') %}active{% endif %}" 
+                            <a class="nav-link dropdown-toggle px-3 py-2 {% if request.endpoint and request.endpoint.startswith('scouting') %}active{% endif %}" 
                                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-clipboard-list nav-icon"></i> Scouting
+                                <i class="fas fa-clipboard-list nav-icon"></i> 
+                                <span class="nav-text">Scouting</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-animated shadow-sm">
+                            <ul class="dropdown-menu dropdown-menu-animated shadow">
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint == 'scouting.index' %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint == 'scouting.index' %}active{% endif %}" 
                                        href="{{ url_for('scouting.index') }}">
-                                        <i class="fas fa-home nav-icon text-primary"></i> Dashboard
+                                        <i class="fas fa-home nav-icon text-primary"></i> 
+                                        <span>Dashboard</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint == 'scouting.scouting_form' %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint == 'scouting.scouting_form' %}active{% endif %}" 
                                        href="{{ url_for('scouting.scouting_form') }}">
-                                        <i class="fas fa-rocket nav-icon text-success"></i> Start Scouting
+                                        <i class="fas fa-rocket nav-icon text-success"></i> 
+                                        <span>Start Scouting</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint == 'pit_scouting.index' %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint == 'pit_scouting.index' %}active{% endif %}" 
                                        href="{{ url_for('pit_scouting.index') }}">
-                                        <i class="fas fa-wrench nav-icon text-primary"></i> Pit Scouting
+                                        <i class="fas fa-wrench nav-icon text-primary"></i> 
+                                        <span>Pit Scouting</span>
                                     </a>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li><hr class="dropdown-divider my-1"></li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint == 'scouting.list_data' %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint == 'scouting.list_data' %}active{% endif %}" 
                                        href="{{ url_for('scouting.list_data') }}">
-                                        <i class="fas fa-list nav-icon text-info"></i> All Scouting Data
+                                        <i class="fas fa-list nav-icon text-info"></i> 
+                                        <span>All Scouting Data</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint == 'scouting.view_text_elements' %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint == 'scouting.view_text_elements' %}active{% endif %}" 
                                        href="{{ url_for('scouting.view_text_elements') }}">
-                                        <i class="fas fa-comment-alt nav-icon text-warning"></i> Text Elements
+                                        <i class="fas fa-comment-alt nav-icon text-warning"></i> 
+                                        <span>Text Elements</span>
                                     </a>
                                 </li>
                             </ul>
@@ -130,48 +142,55 @@
                         
                         {% if user_has_role('admin') or user_has_role('analytics') %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if request.endpoint and (request.endpoint.startswith('visualization') or request.endpoint.startswith('graphs')) %}active{% endif %}" 
+                            <a class="nav-link dropdown-toggle px-3 py-2 {% if request.endpoint and (request.endpoint.startswith('visualization') or request.endpoint.startswith('graphs')) %}active{% endif %}" 
                                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-chart-line nav-icon"></i> Analytics
+                                <i class="fas fa-chart-line nav-icon"></i> 
+                                <span class="nav-text">Analytics</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-animated shadow-sm">
+                            <ul class="dropdown-menu dropdown-menu-animated shadow">
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith('visualization') %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint and request.endpoint.startswith('visualization') %}active{% endif %}" 
                                        href="{{ url_for('visualization.index') }}">
-                                        <i class="fas fa-chart-bar nav-icon text-primary"></i> Team Performance
+                                        <i class="fas fa-chart-bar nav-icon text-primary"></i> 
+                                        <span>Team Performance</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint and request.endpoint.startswith('graphs') %}active{% endif %}" 
+                                    <a class="dropdown-item py-2 {% if request.endpoint and request.endpoint.startswith('graphs') %}active{% endif %}" 
                                        href="{{ url_for('graphs.index') }}">
-                                        <i class="fas fa-chart-pie nav-icon text-success"></i> Advanced Graphs
+                                        <i class="fas fa-chart-pie nav-icon text-success"></i> 
+                                        <span>Advanced Graphs</span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         
                         <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint and request.endpoint.startswith('assistant') %}active{% endif %}" 
+                            <a class="nav-link px-3 py-2 {% if request.endpoint and request.endpoint.startswith('assistant') %}active{% endif %}" 
                                href="{{ url_for('assistant.index') }}">
-                                <i class="fas fa-robot nav-icon"></i> Assistant
+                                <i class="fas fa-robot nav-icon"></i> 
+                                <span class="nav-text">Assistant</span>
                             </a>
                         </li>
                         
                         <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint and request.endpoint.startswith('data') %}active{% endif %}" 
+                            <a class="nav-link px-3 py-2 {% if request.endpoint and request.endpoint.startswith('data') %}active{% endif %}" 
                                href="{{ url_for('data.index') }}">
-                                <i class="fas fa-database nav-icon"></i> Data Management
+                                <i class="fas fa-database nav-icon"></i> 
+                                <span class="nav-text">Data</span>
                             </a>
                         </li>
                         {% endif %}
                     </ul>
                     {% endif %}
                     
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center navbar-actions">
                         {% if game_config %}
-                        <div class="game-badge me-3 d-none d-md-block">
-                            <span class="badge rounded-pill bg-light text-dark">
-                                <i class="fas fa-gamepad me-1"></i> {{ game_config.game_name }} {{ game_config.season }}
+                        <div class="game-badge me-3 d-none d-lg-block">
+                            <span class="badge bg-light text-dark border">
+                                <i class="fas fa-gamepad me-1"></i> 
+                                <span class="d-none d-xl-inline">{{ game_config.game_name }}</span>
+                                <span class="d-xl-none">{{ game_config.season }}</span>
                             </span>
                         </div>
                         {% endif %}
@@ -179,14 +198,16 @@
                         {% if current_user.is_authenticated %}
                         <!-- User Menu -->
                         <div class="dropdown me-2">
-                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user"></i>
-                                <span class="d-none d-md-inline ms-1">{{ current_user.username }}</span>
+                            <button class="btn btn-outline-primary btn-sm d-flex align-items-center dropdown-toggle" 
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span class="d-none d-md-inline">{{ current_user.username }}</span>
+                                <span class="d-md-none">User</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
                                 <li>
-                                    <div class="dropdown-header">
-                                        <div class="fw-bold">{{ current_user.username }}</div>
+                                    <div class="dropdown-header border-bottom pb-2 mb-2">
+                                        <div class="fw-bold text-primary">{{ current_user.username }}</div>
                                         <div class="small text-muted">
                                             {% for role in current_user.roles %}
                                                 <span class="badge bg-secondary me-1">{{ role.name.title() }}</span>
@@ -194,42 +215,42 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('auth.profile') }}">
-                                        <i class="fas fa-user me-2"></i> Profile
+                                    <a class="dropdown-item py-2" href="{{ url_for('auth.profile') }}">
+                                        <i class="fas fa-user-edit me-2 text-primary"></i> Edit Profile
                                     </a>
                                 </li>
                                 {% if user_has_role('admin') %}
+                                <li><hr class="dropdown-divider my-1"></li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('auth.admin_settings') }}">
-                                        <i class="fas fa-cogs me-2"></i> Admin Settings
+                                    <a class="dropdown-item py-2" href="{{ url_for('auth.admin_settings') }}">
+                                        <i class="fas fa-cogs me-2 text-info"></i> Admin Settings
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('auth.admin_integrity') }}">
-                                        <i class="fas fa-shield-alt me-2"></i> File Integrity
+                                    <a class="dropdown-item py-2" href="{{ url_for('auth.admin_integrity') }}">
+                                        <i class="fas fa-shield-alt me-2 text-warning"></i> File Integrity
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('auth.manage_users') }}">
-                                        <i class="fas fa-users-cog me-2"></i> Manage Users
+                                    <a class="dropdown-item py-2" href="{{ url_for('auth.manage_users') }}">
+                                        <i class="fas fa-users-cog me-2 text-success"></i> Manage Users
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('activity.view_logs') }}">
-                                        <i class="fas fa-history me-2"></i> Activity Logs
+                                    <a class="dropdown-item py-2" href="{{ url_for('activity.view_logs') }}">
+                                        <i class="fas fa-history me-2 text-secondary"></i> Activity Logs
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('auth.system_check') }}">
-                                        <i class="fas fa-cogs me-2"></i> System Check
+                                    <a class="dropdown-item py-2" href="{{ url_for('auth.system_check') }}">
+                                        <i class="fas fa-heartbeat me-2 text-danger"></i> System Check
                                     </a>
                                 </li>
                                 {% endif %}
-                                <li><hr class="dropdown-divider"></li>
+                                <li><hr class="dropdown-divider my-1"></li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}">
                                         <i class="fas fa-sign-out-alt me-2"></i> Logout
                                     </a>
                                 </li>
@@ -239,23 +260,25 @@
                         
                         {% if current_user.is_authenticated and (user_has_role('admin') or user_has_role('analytics')) %}
                         <div class="dropdown">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-cog"></i>
-                                <span class="d-none d-md-inline ms-1">Settings</span>
+                            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center dropdown-toggle" 
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-cog me-1"></i>
+                                <span class="d-none d-lg-inline">Settings</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
                                 <li>
-                                    <a class="dropdown-item {% if request.endpoint == 'main.config' %}active{% endif %}" href="{{ url_for('main.config') }}">
-                                        <i class="fas fa-wrench me-2"></i> Game Configuration
+                                    <a class="dropdown-item py-2 {% if request.endpoint == 'main.config' %}active{% endif %}" 
+                                       href="{{ url_for('main.config') }}">
+                                        <i class="fas fa-wrench me-2 text-primary"></i> Game Configuration
                                     </a>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li><hr class="dropdown-divider my-1"></li>
                                 <li>
                                     <div class="px-3 py-2">
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" id="darkModeToggle">
-                                            <label class="form-check-label" for="darkModeToggle">
-                                                <i class="fas fa-moon me-2"></i> Dark Mode
+                                            <label class="form-check-label d-flex align-items-center" for="darkModeToggle">
+                                                <i class="fas fa-moon me-2 text-secondary"></i> Dark Mode
                                             </label>
                                         </div>
                                     </div>
