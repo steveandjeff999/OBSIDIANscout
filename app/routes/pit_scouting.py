@@ -524,6 +524,11 @@ def config_simple_save():
         return redirect(url_for('pit_scouting.index'))
     
     try:
+        # Debug: Print form data
+        print("Form data received:")
+        for key, value in request.form.items():
+            print(f"  {key}: {value}")
+        
         # Get current config as base
         updated_config = {
             "pit_scouting": {
@@ -540,9 +545,13 @@ def config_simple_save():
                 index = key.split('_')[-1]
                 section_indices.add(int(index))
         
+        print(f"Section indices found: {section_indices}")
+        
         for section_index in sorted(section_indices):
             section_id = request.form.get(f'section_id_{section_index}')
             section_name = request.form.get(f'section_name_{section_index}')
+            
+            print(f"Processing section {section_index}: {section_id} - {section_name}")
             
             if section_id and section_name:
                 section = {
@@ -558,10 +567,14 @@ def config_simple_save():
                         index = key.split('_')[-1]
                         element_indices.add(int(index))
                 
+                print(f"  Element indices for section {section_index}: {element_indices}")
+                
                 for element_index in sorted(element_indices):
                     element_id = request.form.get(f'element_id_{section_index}_{element_index}')
                     element_name = request.form.get(f'element_name_{section_index}_{element_index}')
                     element_type = request.form.get(f'element_type_{section_index}_{element_index}')
+                    
+                    print(f"    Processing element {element_index}: {element_id} - {element_name} ({element_type})")
                     
                     if element_id and element_name and element_type:
                         element = {
@@ -616,6 +629,8 @@ def config_simple_save():
                 
                 updated_config["pit_scouting"]["sections"].append(section)
         
+        print(f"Final config: {json.dumps(updated_config, indent=2)}")
+        
         # Save the configuration
         config_path = os.path.join(os.getcwd(), 'config', 'pit_config.json')
         
@@ -633,6 +648,9 @@ def config_simple_save():
         return redirect(url_for('pit_scouting.config'))
         
     except Exception as e:
+        print(f"Error in config_simple_save: {e}")
+        import traceback
+        traceback.print_exc()
         flash(f'Error updating configuration: {str(e)}', 'error')
         return redirect(url_for('pit_scouting.config_simple_edit'))
 
@@ -682,8 +700,7 @@ def config_reset():
                                 "id": "team_name",
                                 "perm_id": "team_name",
                                 "name": "Team Name",
-                                "type": "text",
-                                "required": False
+                                "type": "text"
                             },
                             {
                                 "id": "drive_team_experience",
@@ -691,9 +708,18 @@ def config_reset():
                                 "name": "Drive Team Experience",
                                 "type": "select",
                                 "options": [
-                                    {"value": "rookie", "label": "Rookie (0-1 years)"},
-                                    {"value": "experienced", "label": "Experienced (2-4 years)"},
-                                    {"value": "veteran", "label": "Veteran (5+ years)"}
+                                    {
+                                        "value": "rookie",
+                                        "label": "Rookie (0-1 years)"
+                                    },
+                                    {
+                                        "value": "experienced",
+                                        "label": "Experienced (2-4 years)"
+                                    },
+                                    {
+                                        "value": "veteran",
+                                        "label": "Veteran (5+ years)"
+                                    }
                                 ]
                             },
                             {
@@ -702,11 +728,26 @@ def config_reset():
                                 "name": "Programming Language",
                                 "type": "select",
                                 "options": [
-                                    {"value": "java", "label": "Java"},
-                                    {"value": "cpp", "label": "C++"},
-                                    {"value": "python", "label": "Python"},
-                                    {"value": "labview", "label": "LabVIEW"},
-                                    {"value": "other", "label": "Other"}
+                                    {
+                                        "value": "java",
+                                        "label": "Java"
+                                    },
+                                    {
+                                        "value": "cpp",
+                                        "label": "C++"
+                                    },
+                                    {
+                                        "value": "python",
+                                        "label": "Python"
+                                    },
+                                    {
+                                        "value": "labview",
+                                        "label": "LabVIEW"
+                                    },
+                                    {
+                                        "value": "other",
+                                        "label": "Other"
+                                    }
                                 ]
                             }
                         ]
@@ -721,11 +762,26 @@ def config_reset():
                                 "name": "Drivetrain Type",
                                 "type": "select",
                                 "options": [
-                                    {"value": "tank", "label": "Tank Drive"},
-                                    {"value": "mecanum", "label": "Mecanum"},
-                                    {"value": "swerve", "label": "Swerve"},
-                                    {"value": "west_coast", "label": "West Coast Drive"},
-                                    {"value": "other", "label": "Other"}
+                                    {
+                                        "value": "tank",
+                                        "label": "Tank Drive"
+                                    },
+                                    {
+                                        "value": "mecanum",
+                                        "label": "Mecanum"
+                                    },
+                                    {
+                                        "value": "swerve",
+                                        "label": "Swerve"
+                                    },
+                                    {
+                                        "value": "west_coast",
+                                        "label": "West Coast Drive"
+                                    },
+                                    {
+                                        "value": "other",
+                                        "label": "Other"
+                                    }
                                 ]
                             },
                             {
@@ -744,11 +800,26 @@ def config_reset():
                                 "name": "Drive Motor Type",
                                 "type": "select",
                                 "options": [
-                                    {"value": "neo", "label": "NEO"},
-                                    {"value": "cim", "label": "CIM"},
-                                    {"value": "falcon500", "label": "Falcon 500"},
-                                    {"value": "kraken", "label": "Kraken X60"},
-                                    {"value": "other", "label": "Other"}
+                                    {
+                                        "value": "neo",
+                                        "label": "NEO"
+                                    },
+                                    {
+                                        "value": "cim",
+                                        "label": "CIM"
+                                    },
+                                    {
+                                        "value": "falcon500",
+                                        "label": "Falcon 500"
+                                    },
+                                    {
+                                        "value": "kraken",
+                                        "label": "Kraken X60"
+                                    },
+                                    {
+                                        "value": "other",
+                                        "label": "Other"
+                                    }
                                 ]
                             },
                             {
@@ -791,8 +862,7 @@ def config_reset():
                                 "id": "can_score_coral",
                                 "perm_id": "can_score_coral",
                                 "name": "Can Score CORAL",
-                                "type": "boolean",
-                                "default": False
+                                "type": "boolean"
                             },
                             {
                                 "id": "coral_intake_method",
@@ -800,10 +870,22 @@ def config_reset():
                                 "name": "CORAL Intake Method",
                                 "type": "select",
                                 "options": [
-                                    {"value": "none", "label": "Cannot Intake"},
-                                    {"value": "ground", "label": "Ground Pickup"},
-                                    {"value": "station", "label": "Human Player Station"},
-                                    {"value": "both", "label": "Both Ground and Station"}
+                                    {
+                                        "value": "none",
+                                        "label": "Cannot Intake"
+                                    },
+                                    {
+                                        "value": "ground",
+                                        "label": "Ground Pickup"
+                                    },
+                                    {
+                                        "value": "station",
+                                        "label": "Human Player Station"
+                                    },
+                                    {
+                                        "value": "both",
+                                        "label": "Both Ground and Station"
+                                    }
                                 ]
                             },
                             {
@@ -812,10 +894,22 @@ def config_reset():
                                 "name": "CORAL Levels Robot Can Score",
                                 "type": "multiselect",
                                 "options": [
-                                    {"value": "l1", "label": "Level 1"},
-                                    {"value": "l2", "label": "Level 2"},
-                                    {"value": "l3", "label": "Level 3"},
-                                    {"value": "l4", "label": "Level 4"}
+                                    {
+                                        "value": "l1",
+                                        "label": "Level 1"
+                                    },
+                                    {
+                                        "value": "l2",
+                                        "label": "Level 2"
+                                    },
+                                    {
+                                        "value": "l3",
+                                        "label": "Level 3"
+                                    },
+                                    {
+                                        "value": "l4",
+                                        "label": "Level 4"
+                                    }
                                 ]
                             },
                             {
@@ -826,16 +920,6 @@ def config_reset():
                                 "validation": {
                                     "min": 0,
                                     "max": 150
-                                }
-                            },
-                            {
-                                "id": "coral_hold_capacity",
-                                "perm_id": "coral_hold_capacity",
-                                "name": "Max CORAL Hold Capacity",
-                                "type": "number",
-                                "validation": {
-                                    "min": 0,
-                                    "max": 10
                                 }
                             }
                         ]
@@ -848,8 +932,7 @@ def config_reset():
                                 "id": "can_score_algae",
                                 "perm_id": "can_score_algae",
                                 "name": "Can Score ALGAE",
-                                "type": "boolean",
-                                "default": False
+                                "type": "boolean"
                             },
                             {
                                 "id": "algae_intake_method",
@@ -857,10 +940,22 @@ def config_reset():
                                 "name": "ALGAE Intake Method",
                                 "type": "select",
                                 "options": [
-                                    {"value": "none", "label": "Cannot Intake"},
-                                    {"value": "ground", "label": "Ground Pickup"},
-                                    {"value": "station", "label": "Human Player Station"},
-                                    {"value": "both", "label": "Both Ground and Station"}
+                                    {
+                                        "value": "none",
+                                        "label": "Cannot Intake"
+                                    },
+                                    {
+                                        "value": "ground",
+                                        "label": "Ground Pickup"
+                                    },
+                                    {
+                                        "value": "station",
+                                        "label": "Human Player Station"
+                                    },
+                                    {
+                                        "value": "both",
+                                        "label": "Both Ground and Station"
+                                    }
                                 ]
                             },
                             {
@@ -869,8 +964,14 @@ def config_reset():
                                 "name": "ALGAE Scoring Locations",
                                 "type": "multiselect",
                                 "options": [
-                                    {"value": "processor", "label": "Processor"},
-                                    {"value": "net", "label": "Net"}
+                                    {
+                                        "value": "processor",
+                                        "label": "Processor"
+                                    },
+                                    {
+                                        "value": "net",
+                                        "label": "Net"
+                                    }
                                 ]
                             },
                             {
@@ -881,16 +982,6 @@ def config_reset():
                                 "validation": {
                                     "min": 0,
                                     "max": 150
-                                }
-                            },
-                            {
-                                "id": "algae_hold_capacity",
-                                "perm_id": "algae_hold_capacity",
-                                "name": "Max ALGAE Hold Capacity",
-                                "type": "number",
-                                "validation": {
-                                    "min": 0,
-                                    "max": 10
                                 }
                             }
                         ]
@@ -903,29 +994,25 @@ def config_reset():
                                 "id": "autonomous_leave_zone",
                                 "perm_id": "autonomous_leave_zone",
                                 "name": "Can Leave Starting Zone in Auto",
-                                "type": "boolean",
-                                "default": False
+                                "type": "boolean"
                             },
                             {
                                 "id": "autonomous_score_coral",
                                 "perm_id": "autonomous_score_coral",
                                 "name": "Can Score CORAL in Auto",
-                                "type": "boolean",
-                                "default": False
+                                "type": "boolean"
                             },
                             {
                                 "id": "autonomous_score_algae",
                                 "perm_id": "autonomous_score_algae",
                                 "name": "Can Score ALGAE in Auto",
-                                "type": "boolean",
-                                "default": False
+                                "type": "boolean"
                             },
                             {
                                 "id": "autonomous_collect_pieces",
                                 "perm_id": "autonomous_collect_pieces",
                                 "name": "Can Collect Game Pieces in Auto",
-                                "type": "boolean",
-                                "default": False
+                                "type": "boolean"
                             },
                             {
                                 "id": "autonomous_starting_position",
@@ -933,10 +1020,22 @@ def config_reset():
                                 "name": "Preferred Starting Position",
                                 "type": "select",
                                 "options": [
-                                    {"value": "left", "label": "Left"},
-                                    {"value": "center", "label": "Center"},
-                                    {"value": "right", "label": "Right"},
-                                    {"value": "flexible", "label": "Flexible"}
+                                    {
+                                        "value": "left",
+                                        "label": "Left"
+                                    },
+                                    {
+                                        "value": "center",
+                                        "label": "Center"
+                                    },
+                                    {
+                                        "value": "right",
+                                        "label": "Right"
+                                    },
+                                    {
+                                        "value": "flexible",
+                                        "label": "Flexible"
+                                    }
                                 ]
                             },
                             {
@@ -959,8 +1058,7 @@ def config_reset():
                                 "id": "can_climb",
                                 "perm_id": "can_climb",
                                 "name": "Can Climb",
-                                "type": "boolean",
-                                "default": False
+                                "type": "boolean"
                             },
                             {
                                 "id": "climb_levels",
@@ -968,9 +1066,22 @@ def config_reset():
                                 "name": "Climb Levels Achieved",
                                 "type": "multiselect",
                                 "options": [
-                                    {"value": "shallow", "label": "Shallow Climb"},
-                                    {"value": "deep", "label": "Deep Climb"},
-                                    {"value": "harmony", "label": "Harmony Climb"}
+                                    {
+                                        "value": "none",
+                                        "label": "none"
+                                    },
+                                    {
+                                        "value": "park",
+                                        "label": "park"
+                                    },
+                                    {
+                                        "value": "shallow",
+                                        "label": "Shallow Climb"
+                                    },
+                                    {
+                                        "value": "deep",
+                                        "label": "Deep Climb"
+                                    }
                                 ]
                             },
                             {
@@ -980,22 +1091,8 @@ def config_reset():
                                 "type": "number",
                                 "validation": {
                                     "min": 0,
-                                    "max": 30
+                                    "max": 60
                                 }
-                            },
-                            {
-                                "id": "can_assist_climb",
-                                "perm_id": "can_assist_climb",
-                                "name": "Can Assist Other Robots in Climbing",
-                                "type": "boolean",
-                                "default": False
-                            },
-                            {
-                                "id": "endgame_park",
-                                "perm_id": "endgame_park",
-                                "name": "Can Park in Endgame",
-                                "type": "boolean",
-                                "default": False
                             }
                         ]
                     },
@@ -1037,10 +1134,22 @@ def config_reset():
                                 "name": "Driver Skill Level",
                                 "type": "select",
                                 "options": [
-                                    {"value": "novice", "label": "Novice"},
-                                    {"value": "intermediate", "label": "Intermediate"},
-                                    {"value": "advanced", "label": "Advanced"},
-                                    {"value": "expert", "label": "Expert"}
+                                    {
+                                        "value": "novice",
+                                        "label": "Novice"
+                                    },
+                                    {
+                                        "value": "intermediate",
+                                        "label": "Intermediate"
+                                    },
+                                    {
+                                        "value": "advanced",
+                                        "label": "Advanced"
+                                    },
+                                    {
+                                        "value": "expert",
+                                        "label": "Expert"
+                                    }
                                 ]
                             },
                             {

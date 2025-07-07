@@ -22,8 +22,7 @@
             "id": "team_name",
             "perm_id": "team_name",
             "name": "Team Name",
-            "type": "text",
-            "required": false
+            "type": "text"
           },
           {
             "id": "drive_team_experience",
@@ -31,9 +30,18 @@
             "name": "Drive Team Experience",
             "type": "select",
             "options": [
-              {"value": "rookie", "label": "Rookie (0-1 years)"},
-              {"value": "experienced", "label": "Experienced (2-4 years)"},
-              {"value": "veteran", "label": "Veteran (5+ years)"}
+              {
+                "value": "rookie",
+                "label": "Rookie (0-1 years)"
+              },
+              {
+                "value": "experienced",
+                "label": "Experienced (2-4 years)"
+              },
+              {
+                "value": "veteran",
+                "label": "Veteran (5+ years)"
+              }
             ]
           },
           {
@@ -42,11 +50,26 @@
             "name": "Programming Language",
             "type": "select",
             "options": [
-              {"value": "java", "label": "Java"},
-              {"value": "cpp", "label": "C++"},
-              {"value": "python", "label": "Python"},
-              {"value": "labview", "label": "LabVIEW"},
-              {"value": "other", "label": "Other"}
+              {
+                "value": "java",
+                "label": "Java"
+              },
+              {
+                "value": "cpp",
+                "label": "C++"
+              },
+              {
+                "value": "python",
+                "label": "Python"
+              },
+              {
+                "value": "labview",
+                "label": "LabVIEW"
+              },
+              {
+                "value": "other",
+                "label": "Other"
+              }
             ]
           }
         ]
@@ -61,11 +84,26 @@
             "name": "Drivetrain Type",
             "type": "select",
             "options": [
-              {"value": "tank", "label": "Tank Drive"},
-              {"value": "mecanum", "label": "Mecanum"},
-              {"value": "swerve", "label": "Swerve"},
-              {"value": "west_coast", "label": "West Coast Drive"},
-              {"value": "other", "label": "Other"}
+              {
+                "value": "tank",
+                "label": "Tank Drive"
+              },
+              {
+                "value": "mecanum",
+                "label": "Mecanum"
+              },
+              {
+                "value": "swerve",
+                "label": "Swerve"
+              },
+              {
+                "value": "west_coast",
+                "label": "West Coast Drive"
+              },
+              {
+                "value": "other",
+                "label": "Other"
+              }
             ]
           },
           {
@@ -84,12 +122,26 @@
             "name": "Drive Motor Type",
             "type": "select",
             "options": [
-              {"value": "neo", "label": "NEO"},
-              {"value": "neo550", "label": "NEO 550"},
-              {"value": "cim", "label": "CIM"},
-              {"value": "falcon500", "label": "Falcon 500"},
-              {"value": "kraken", "label": "Kraken X60"},
-              {"value": "other", "label": "Other"}
+              {
+                "value": "neo",
+                "label": "NEO"
+              },
+              {
+                "value": "cim",
+                "label": "CIM"
+              },
+              {
+                "value": "falcon500",
+                "label": "Falcon 500"
+              },
+              {
+                "value": "kraken",
+                "label": "Kraken X60"
+              },
+              {
+                "value": "other",
+                "label": "Other"
+              }
             ]
           },
           {
@@ -109,7 +161,7 @@
             "type": "number",
             "validation": {
               "min": 0,
-              "max": 84
+              "max": 840
             }
           },
           {
@@ -119,7 +171,7 @@
             "type": "number",
             "validation": {
               "min": 0,
-              "max": 20
+              "max": 30
             }
           }
         ]
@@ -132,8 +184,7 @@
             "id": "can_score_coral",
             "perm_id": "can_score_coral",
             "name": "Can Score CORAL",
-            "type": "boolean",
-            "default": false
+            "type": "boolean"
           },
           {
             "id": "coral_intake_method",
@@ -141,10 +192,22 @@
             "name": "CORAL Intake Method",
             "type": "select",
             "options": [
-              {"value": "none", "label": "Cannot Intake"},
-              {"value": "ground", "label": "Ground Pickup"},
-              {"value": "station", "label": "Human Player Station"},
-              {"value": "both", "label": "Both Ground and Station"}
+              {
+                "value": "none",
+                "label": "Cannot Intake"
+              },
+              {
+                "value": "ground",
+                "label": "Ground Pickup"
+              },
+              {
+                "value": "station",
+                "label": "Human Player Station"
+              },
+              {
+                "value": "both",
+                "label": "Both Ground and Station"
+              }
             ]
           },
           {
@@ -153,10 +216,22 @@
             "name": "CORAL Levels Robot Can Score",
             "type": "multiselect",
             "options": [
-              {"value": "l1", "label": "Level 1"},
-              {"value": "l2", "label": "Level 2"},
-              {"value": "l3", "label": "Level 3"},
-              {"value": "l4", "label": "Level 4"}
+              {
+                "value": "l1",
+                "label": "Level 1"
+              },
+              {
+                "value": "l2",
+                "label": "Level 2"
+              },
+              {
+                "value": "l3",
+                "label": "Level 3"
+              },
+              {
+                "value": "l4",
+                "label": "Level 4"
+              }
             ]
           },
           {
@@ -167,16 +242,6 @@
             "validation": {
               "min": 0,
               "max": 150
-            }
-          },
-          {
-            "id": "coral_hold_capacity",
-            "perm_id": "coral_hold_capacity",
-            "name": "Max CORAL Hold Capacity",
-            "type": "number",
-            "validation": {
-              "min": 0,
-              "max": 10
             }
           }
         ]
@@ -189,8 +254,7 @@
             "id": "can_score_algae",
             "perm_id": "can_score_algae",
             "name": "Can Score ALGAE",
-            "type": "boolean",
-            "default": false
+            "type": "boolean"
           },
           {
             "id": "algae_intake_method",
@@ -198,10 +262,22 @@
             "name": "ALGAE Intake Method",
             "type": "select",
             "options": [
-              {"value": "none", "label": "Cannot Intake"},
-              {"value": "ground", "label": "Ground Pickup"},
-              {"value": "station", "label": "Human Player Station"},
-              {"value": "both", "label": "Both Ground and Station"}
+              {
+                "value": "none",
+                "label": "Cannot Intake"
+              },
+              {
+                "value": "ground",
+                "label": "Ground Pickup"
+              },
+              {
+                "value": "station",
+                "label": "Human Player Station"
+              },
+              {
+                "value": "both",
+                "label": "Both Ground and Station"
+              }
             ]
           },
           {
@@ -210,8 +286,14 @@
             "name": "ALGAE Scoring Locations",
             "type": "multiselect",
             "options": [
-              {"value": "processor", "label": "Processor"},
-              {"value": "net", "label": "Net"}
+              {
+                "value": "processor",
+                "label": "Processor"
+              },
+              {
+                "value": "net",
+                "label": "Net"
+              }
             ]
           },
           {
@@ -222,16 +304,6 @@
             "validation": {
               "min": 0,
               "max": 150
-            }
-          },
-          {
-            "id": "algae_hold_capacity",
-            "perm_id": "algae_hold_capacity",
-            "name": "Max ALGAE Hold Capacity",
-            "type": "number",
-            "validation": {
-              "min": 0,
-              "max": 10
             }
           }
         ]
@@ -244,29 +316,25 @@
             "id": "autonomous_leave_zone",
             "perm_id": "autonomous_leave_zone",
             "name": "Can Leave Starting Zone in Auto",
-            "type": "boolean",
-            "default": false
+            "type": "boolean"
           },
           {
             "id": "autonomous_score_coral",
             "perm_id": "autonomous_score_coral",
             "name": "Can Score CORAL in Auto",
-            "type": "boolean",
-            "default": false
+            "type": "boolean"
           },
           {
             "id": "autonomous_score_algae",
             "perm_id": "autonomous_score_algae",
             "name": "Can Score ALGAE in Auto",
-            "type": "boolean",
-            "default": false
+            "type": "boolean"
           },
           {
             "id": "autonomous_collect_pieces",
             "perm_id": "autonomous_collect_pieces",
             "name": "Can Collect Game Pieces in Auto",
-            "type": "boolean",
-            "default": false
+            "type": "boolean"
           },
           {
             "id": "autonomous_starting_position",
@@ -274,10 +342,22 @@
             "name": "Preferred Starting Position",
             "type": "select",
             "options": [
-              {"value": "left", "label": "Left"},
-              {"value": "center", "label": "Center"},
-              {"value": "right", "label": "Right"},
-              {"value": "flexible", "label": "Flexible"}
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              },
+              {
+                "value": "flexible",
+                "label": "Flexible"
+              }
             ]
           },
           {
@@ -300,8 +380,7 @@
             "id": "can_climb",
             "perm_id": "can_climb",
             "name": "Can Climb",
-            "type": "boolean",
-            "default": false
+            "type": "boolean"
           },
           {
             "id": "climb_levels",
@@ -309,9 +388,22 @@
             "name": "Climb Levels Achieved",
             "type": "multiselect",
             "options": [
-              {"value": "shallow", "label": "Shallow Climb"},
-              {"value": "deep", "label": "Deep Climb"},
-              {"value": "harmony", "label": "Harmony Climb"}
+              {
+                "value": "none",
+                "label": "none"
+              },
+              {
+                "value": "park",
+                "label": "park"
+              },
+              {
+                "value": "shallow",
+                "label": "Shallow Climb"
+              },
+              {
+                "value": "deep",
+                "label": "Deep Climb"
+              }
             ]
           },
           {
@@ -321,22 +413,8 @@
             "type": "number",
             "validation": {
               "min": 0,
-              "max": 30
+              "max": 60
             }
-          },
-          {
-            "id": "can_assist_climb",
-            "perm_id": "can_assist_climb",
-            "name": "Can Assist Other Robots in Climbing",
-            "type": "boolean",
-            "default": false
-          },
-          {
-            "id": "endgame_park",
-            "perm_id": "endgame_park",
-            "name": "Can Park in Endgame",
-            "type": "boolean",
-            "default": false
           }
         ]
       },
@@ -378,10 +456,22 @@
             "name": "Driver Skill Level",
             "type": "select",
             "options": [
-              {"value": "novice", "label": "Novice"},
-              {"value": "intermediate", "label": "Intermediate"},
-              {"value": "advanced", "label": "Advanced"},
-              {"value": "expert", "label": "Expert"}
+              {
+                "value": "novice",
+                "label": "Novice"
+              },
+              {
+                "value": "intermediate",
+                "label": "Intermediate"
+              },
+              {
+                "value": "advanced",
+                "label": "Advanced"
+              },
+              {
+                "value": "expert",
+                "label": "Expert"
+              }
             ]
           },
           {
