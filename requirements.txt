@@ -17,3 +17,6 @@ eventlet==0.33.3
 pyOpenSSL==24.1.0
 flask-paginate==2023.10.8
 requests==2.31.0
+numpy
+Flask-Migrate
+alembic
