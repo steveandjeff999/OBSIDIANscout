@@ -342,8 +342,14 @@ class SystemCheck:
                         else:
                             metric_issues = []
                             for metric in metrics:
-                                required_metric_keys = ['id', 'name', 'formula']
+                                # Basic required keys for all metrics
+                                required_metric_keys = ['id', 'name']
                                 missing_keys = [key for key in required_metric_keys if key not in metric]
+                                
+                                # Only require formula if the metric is not auto-generated
+                                if not metric.get('auto_generated', False) and 'formula' not in metric:
+                                    missing_keys.append('formula')
+                                
                                 if missing_keys:
                                     metric_issues.append(f"Metric {metric.get('id', 'unknown')} missing keys: {', '.join(missing_keys)}")
                             
