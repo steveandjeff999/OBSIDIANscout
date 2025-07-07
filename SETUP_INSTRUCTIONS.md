@@ -37,6 +37,12 @@
    - Add new users with different roles
    - Test the system by logging in with different user accounts
 
+7. **Important:** Set up your first API credentials:
+   - Navigate to the API configuration section in game_config.json
+   - Enter your first API username and key
+   - This is required for the application to function properly with external data sources
+   - Restart the program for changes to take effect
+
 ## Role-based access:
 
 - **Admin users** can access everything

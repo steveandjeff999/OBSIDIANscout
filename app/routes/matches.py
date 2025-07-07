@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.routes.auth import analytics_required
 from app.models import Match, Event, Team, ScoutingData
 from app import db
@@ -371,3 +371,96 @@ def predict_print(match_id):
         game_config=game_config,
         now=datetime.now()
     )
+
+@bp.route('/strategy')
+@analytics_required
+def strategy():
+    """Match strategy analysis page"""
+    # Get all events for the dropdown
+    events = Event.query.order_by(Event.year.desc(), Event.name).all()
+    
+    # Get event from URL parameter or form
+    event_id = request.args.get('event_id', type=int) or request.form.get('event_id', type=int)
+    event = None
+    matches = []
+    
+    if event_id:
+        # If a specific event ID is requested, use that
+        event = Event.query.get_or_404(event_id)
+        
+        # Get all matches for this event
+        matches = Match.query.filter_by(event_id=event.id).order_by(Match.match_type, Match.match_number).all()
+    
+    # Get game configuration
+    game_config = current_app.config.get('GAME_CONFIG', {})
+    
+    return render_template(
+        'matches/strategy.html',
+        events=events,
+        selected_event=event,
+        matches=matches,
+        game_config=game_config
+    )
+
+@bp.route('/strategy/analyze/<int:match_id>')
+@login_required
+def analyze_strategy(match_id):
+    """Generate strategy analysis for a specific match"""
+    from app.utils.analysis import generate_match_strategy_analysis
+    
+    # Check if user has analytics permission
+    if not current_user.is_authenticated:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    user_roles = current_user.get_role_names()
+    if not any(role in user_roles for role in ['admin', 'analytics']):
+        return jsonify({'error': 'Insufficient permissions'}), 403
+    
+    # Get the match
+    match = Match.query.get_or_404(match_id)
+    
+    # Generate strategy analysis
+    try:
+        strategy_data = generate_match_strategy_analysis(match_id)
+        
+        if not strategy_data:
+            return jsonify({'error': 'Unable to generate strategy analysis for this match'}), 404
+        
+        # Convert Team objects to dictionaries to make them JSON serializable
+        def serialize_team_data(team_data):
+            if isinstance(team_data, dict) and 'team' in team_data:
+                serialized = team_data.copy()
+                serialized['team'] = {
+                    'id': team_data['team'].id,
+                    'team_number': team_data['team'].team_number,
+                    'team_name': team_data['team'].team_name,
+                    'location': team_data['team'].location
+                }
+                # Remove scouting_data as it's not JSON serializable and not needed for frontend
+                if 'scouting_data' in serialized:
+                    del serialized['scouting_data']
+                return serialized
+            return team_data
+        
+        # Serialize red alliance teams
+        if 'red_alliance' in strategy_data and 'teams' in strategy_data['red_alliance']:
+            strategy_data['red_alliance']['teams'] = [
+                serialize_team_data(team_data) for team_data in strategy_data['red_alliance']['teams']
+            ]
+        
+        # Serialize blue alliance teams
+        if 'blue_alliance' in strategy_data and 'teams' in strategy_data['blue_alliance']:
+            strategy_data['blue_alliance']['teams'] = [
+                serialize_team_data(team_data) for team_data in strategy_data['blue_alliance']['teams']
+            ]
+        
+        print(f"DEBUG: Strategy data keys: {strategy_data.keys()}")
+        print(f"DEBUG: Red alliance teams count: {len(strategy_data.get('red_alliance', {}).get('teams', []))}")
+        print(f"DEBUG: Blue alliance teams count: {len(strategy_data.get('blue_alliance', {}).get('teams', []))}")
+        
+        return jsonify(strategy_data)
+    except Exception as e:
+        print(f"ERROR in analyze_strategy: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Error generating strategy analysis: {str(e)}'}), 500

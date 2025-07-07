@@ -90,6 +90,13 @@
                                         <span>Match Predictions</span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item py-2 {% if request.endpoint and request.endpoint == 'matches.strategy' %}active{% endif %}" 
+                                       href="{{ url_for('matches.strategy') }}">
+                                        <i class="fas fa-chess nav-icon text-info"></i> 
+                                        <span>Match Strategy</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         {% endif %}

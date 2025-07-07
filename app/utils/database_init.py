@@ -243,51 +243,7 @@ def should_seed_sample_data():
 
 def seed_sample_data():
     """Add sample data to the database for testing"""
-    print("Seeding database with sample data...")
-    
-    # Create sample events
-    events = [
-        Event(
-            name="Practice Event",
-            location="Local High School",
-            start_date=date(datetime.now().year, 3, 15),
-            end_date=date(datetime.now().year, 3, 17),
-            year=datetime.now().year
-        ),
-        Event(
-            name="District Championship",
-            location="Regional Location",
-            start_date=date(datetime.now().year, 4, 17),
-            end_date=date(datetime.now().year, 4, 20),
-            year=datetime.now().year
-        )
-    ]
-    
-    # Add events to database
-    for event in events:
-        existing = Event.query.filter_by(name=event.name, year=event.year).first()
-        if not existing:
-            db.session.add(event)
-    db.session.commit()
-    print(f"Added {len(events)} sample events")
-    
-    # Create sample teams
-    teams = [
-        Team(team_number=5454, team_name="Your Team", location="Your Location"),
-        Team(team_number=254, team_name="Cheesy Poofs", location="San Jose, CA"),
-        Team(team_number=1114, team_name="Simbotics", location="St. Catharines, Ontario"),
-        Team(team_number=118, team_name="Robonauts", location="Houston, TX"),
-        Team(team_number=33, team_name="Killer Bees", location="Auburn Hills, MI"),
-    ]
-    
-    # Add teams to database
-    for team in teams:
-        existing = Team.query.filter_by(team_number=team.team_number).first()
-        if not existing:
-            db.session.add(team)
-    db.session.commit()
-    print(f"Added {len(teams)} sample teams")
-    
+    print("Skipping sample data seeding - no sample data will be added")
     print("Sample data seeding complete!")
 
 def check_database_health():
