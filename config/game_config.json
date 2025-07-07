@@ -1,8 +1,8 @@
 {
   "alliance_size": 3,
   "api_settings": {
-    "username": "jeffstumps",
-    "auth_token": "1dd5bcdb-5b9e-4269-a45d-234af783813a",
+    "username": "your First api username here",
+    "auth_token": "your First api auth token here",
     "base_url": "https://frc-api.firstinspires.org"
   },
   "auto_period": {
