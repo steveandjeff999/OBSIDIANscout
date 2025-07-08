@@ -257,27 +257,32 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
     
     // Initialize Select2 for single team selection
-    $('.team-single-select').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Search for a team...',
-        allowClear: true,
-        width: '100%',
-        templateResult: function(team) {
-            if (!team.id) return team.text;
-            
-            const teamNumber = team.text.split(' - ')[0];
-            const teamName = team.text.split(' - ')[1] || '';
-            
-            return $('<span><strong class="text-primary">' + teamNumber + '</strong> - ' + teamName + '</span>');
-        }
+    $('.team-single-select').each(function() {
+        const options = {
+            theme: 'bootstrap-5',
+            placeholder: 'Search for a team...',
+            allowClear: true,
+            width: '100%',
+            templateResult: function(team) {
+                if (!team.id) return team.text;
+                
+                const teamNumber = team.text.split(' - ')[0];
+                const teamName = team.text.split(' - ')[1] || '';
+                
+                return $('<span><strong class="text-primary">' + teamNumber + '</strong> - ' + teamName + '</span>');
+            }
+        };
+        $(this).data('select2-options', options);
+        $(this).select2(options);
     });
     
     // Initialize Select2 for multi-team selection
-    $('.team-multi-select').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Search and select teams...',
-        allowClear: true,
-        closeOnSelect: false,
+    $('.team-multi-select').each(function() {
+        const options = {
+            theme: 'bootstrap-5',
+            placeholder: 'Search and select teams...',
+            allowClear: true,
+            closeOnSelect: false,
         width: '100%',
         templateResult: function(team) {
             if (!team.id) return team.text;
@@ -298,11 +303,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 return team.text;
             }
         }
+        };
+        $(this).data('select2-options', options);
+        $(this).select2(options);
     });
     
     // Initialize Select2 for event selection
-    $('.event-single-select, .event-filter-select').select2({
-        theme: 'bootstrap-5',
+    $('.event-single-select, .event-filter-select').each(function() {
+        const options = {
+            theme: 'bootstrap-5',
         placeholder: 'Search for an event...',
         allowClear: true,
         width: '100%'

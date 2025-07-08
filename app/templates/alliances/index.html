@@ -215,14 +215,20 @@
 <div class="modal fade" id="teamSelectionModal" tabindex="-1" aria-labelledby="teamSelectionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="teamSelectionModalLabel">Select Team</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="teamSelectionModalLabel"><i class="fas fa-robot me-2"></i>Select Team</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="teamSearchInput" 
-                           placeholder="Search by team number or name..." autocomplete="off">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control form-control-lg" id="teamSearchInput" 
+                               placeholder="Search by team number or name..." autocomplete="off">
+                        <button class="btn btn-outline-secondary" type="button" id="clearSearchButton">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                     <small class="text-muted">Press Enter to select if only one team matches</small>
                 </div>
                 <div id="teamSelectionList" class="list-group" style="max-height: 400px; overflow-y: auto;">
@@ -232,6 +238,9 @@
                     <i class="fas fa-search me-2"></i>No teams found matching your search.
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
         </div>
     </div>
 </div>
@@ -239,6 +248,7 @@
 
 {% block extra_js %}
 <script>
+// @ts-nocheck - Disable TypeScript checking for Jinja templates
 let currentAllianceId = null;
 let currentPosition = null;
 let teamRecommendations = [];
@@ -254,7 +264,9 @@ function initializeSocketIO() {
     socket = io();
     
     // Join the alliance room for this event
-    socket.emit('join_alliance_room', { event_id: {{ current_event.id }} });
+    // Get the event ID from a global variable set by the server
+    const currentEventId = {{ current_event.id|tojson }};
+    socket.emit('join_alliance_room', { event_id: currentEventId });
     
     // Listen for alliance updates
     socket.on('alliance_updated', function(data) {
@@ -263,21 +275,21 @@ function initializeSocketIO() {
     
     // Listen for recommendations updates
     socket.on('recommendations_updated', function(data) {
-        if (data.event_id === {{ current_event.id }}) {
+        if (data.event_id === currentEventId) {
             loadRecommendations();
         }
     });
     
     // Listen for alliance reset
     socket.on('alliances_reset', function(data) {
-        if (data.event_id === {{ current_event.id }}) {
+        if (data.event_id === currentEventId) {
             location.reload();
         }
     });
     
     // Listen for list updates
     socket.on('lists_updated', function(data) {
-        if (data.event_id === {{ current_event.id }}) {
+        if (data.event_id === currentEventId) {
             loadRecommendations(); // Refresh recommendations when lists change
         }
     });
@@ -526,14 +538,62 @@ function showTeamSelectionModal() {
     // Focus on search input after modal is shown and set up event listeners
     document.getElementById('teamSelectionModal').addEventListener('shown.bs.modal', function() {
         const searchInput = document.getElementById('teamSearchInput');
-        searchInput.focus();
+        
+        // Reset the search input and filter
+        searchInput.value = '';
+        filterTeams(); // Call once to reset any filtering
+        
+        // Set focus after a brief delay to ensure mobile keyboard appears
+        setTimeout(() => {
+            searchInput.focus();
+        }, 300);
         
         // Set up real-time search filtering (remove any existing listeners first)
         searchInput.removeEventListener('input', filterTeams);
         searchInput.removeEventListener('keyup', handleSearchKeyup);
         
+        // Use both input and keyup events for more reliable filtering
         searchInput.addEventListener('input', filterTeams);
         searchInput.addEventListener('keyup', handleSearchKeyup);
+        
+        // Handle search on modal shown - clear any previous search
+        const items = document.querySelectorAll('.team-selection-item');
+        items.forEach(item => {
+            item.classList.remove('filtered-out');
+            item.style.display = 'flex';
+        });
+        
+        // Hide "no teams found" message
+        document.getElementById('noTeamsFound').classList.add('d-none');
+        
+        // Ensure any click outside the search doesn't hide the keyboard
+        const modalBody = document.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.addEventListener('click', function(e) {
+                // Don't refocus if clicking on a team item
+                if (!e.target.closest('.team-selection-item')) {
+                    searchInput.focus();
+                }
+            });
+        }
+        
+        // Add clear button functionality with forced UI update
+        document.getElementById('clearSearchButton').addEventListener('click', function() {
+            searchInput.value = '';
+            searchInput.focus();
+            
+            // Show all teams immediately when clearing
+            const items = document.querySelectorAll('.team-selection-item');
+            items.forEach(item => {
+                item.classList.remove('filtered-out');
+                item.style.display = 'flex';
+            });
+            
+            // Hide "no teams found" message
+            document.getElementById('noTeamsFound').classList.add('d-none');
+            
+            console.log("Search cleared - showing all teams");
+        });
     }, { once: true });
 }
 
@@ -578,7 +638,7 @@ function populateTeamSelectionList() {
         
         return `
             <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start team-selection-item"
-                    data-team-id="${team.team_id}" data-team-number="${team.team_number}">
+                    data-team-id="${team.team_id}" data-team-number="${team.team_number}" data-team-name="${team.team_name}">
                 <div>
                     <div class="fw-bold">${warningIcon}Team ${team.team_number}</div>
                     <div class="small text-muted">${team.team_name}</div>
@@ -608,30 +668,44 @@ function populateTeamSelectionList() {
 }
 
 function filterTeams() {
-    const searchTerm = document.getElementById('teamSearchInput').value.toLowerCase();
+    const searchTerm = document.getElementById('teamSearchInput').value.toLowerCase().trim();
     const items = document.querySelectorAll('.team-selection-item');
     const noTeamsFound = document.getElementById('noTeamsFound');
     let visibleCount = 0;
     
+    // Force a style refresh by removing all items from display first
     items.forEach(item => {
-        const teamNumber = item.dataset.teamNumber.toLowerCase();
-        const teamNameElement = item.querySelector('.small.text-muted');
-        const teamName = teamNameElement ? teamNameElement.textContent.toLowerCase() : '';
-        
-        if (teamNumber.includes(searchTerm) || teamName.includes(searchTerm)) {
-            item.style.display = 'flex';
-            visibleCount++;
-        } else {
-            item.style.display = 'none';
-        }
+        item.classList.add('filtered-out');
+        item.style.display = 'none';
     });
     
-    // Show/hide "no teams found" message
-    if (visibleCount === 0 && searchTerm.length > 0) {
-        noTeamsFound.classList.remove('d-none');
-    } else {
-        noTeamsFound.classList.add('d-none');
-    }
+    // Small delay to ensure DOM updates
+    setTimeout(() => {
+        // Apply filtering
+        items.forEach(item => {
+            const teamNumber = (item.dataset.teamNumber || '').toLowerCase();
+            const teamName = (item.dataset.teamName || '').toLowerCase();
+            
+            // Check if either team number or name contains the search term
+            if (teamNumber.includes(searchTerm) || teamName.includes(searchTerm)) {
+                item.style.display = 'flex';
+                item.classList.remove('filtered-out');
+                visibleCount++;
+            }
+        });
+        
+        // Show/hide "no teams found" message
+        if (visibleCount === 0 && searchTerm.length > 0) {
+            noTeamsFound.classList.remove('d-none');
+        } else {
+            noTeamsFound.classList.add('d-none');
+        }
+        
+        console.log(`Search: "${searchTerm}" - Found ${visibleCount} teams (UI updated)`);
+    }, 10);
+    
+    // Update visible count for debugging/feedback
+    console.log(`Search: "${searchTerm}" - Found ${visibleCount} teams`);
 }
 
 function assignTeamToAlliance(allianceId, position, teamNumber) {
@@ -704,53 +778,61 @@ function updateAllianceStrengths() {
 }
 
 .alliance-card {
-    transition: transform 0.2s;
-}
-
-.alliance-card:hover {
-    transform: translateY(-2px);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.2s ease-in-out;
 }
 
 .team-slot {
-    border-left: 3px solid #e9ecef;
-    padding-left: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease-in-out;
 }
 
-.team-slot[data-position="captain"] {
-    border-left-color: #ffc107;
+.team-slot:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
-.team-slot[data-position="first_pick"] {
-    border-left-color: #0dcaf0;
-}
-
-.team-slot[data-position="second_pick"] {
-    border-left-color: #198754;
-}
-
-.team-slot[data-position="third_pick"] {
-    border-left-color: #6c757d;
-}
-
-.recommendation-item {
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.recommendation-item:hover {
-    background-color: rgba(13, 110, 253, 0.1);
+.team-slot-empty {
+    color: #6c757d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .team-info {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
 }
 
-.team-slot-empty {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+/* This ensures filtered teams are truly hidden */
+.filtered-out {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Make sure active teams are visible */
+.team-selection-item:not(.filtered-out) {
+    display: flex !important;
+}
+
+/* Improve visibility of search results */
+#teamSelectionList {
+    max-height: 400px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+/* Improve focus indicator for search input */
+#teamSearchInput:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
 }
 </style>
 {% endblock %}

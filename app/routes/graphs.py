@@ -9,6 +9,7 @@ import json
 import plotly
 import sys
 from app.models import Team, Match, ScoutingData, Event
+from app.utils.analysis import calculate_team_metrics
 
 bp = Blueprint('graphs', __name__, url_prefix='/graphs')
 
@@ -36,10 +37,30 @@ def index():
     
     all_events = Event.query.all()
     
+    # Calculate team metrics for sorting
+    team_metrics = {}
+    for team in all_teams:
+        # Get metrics for the team - function only takes team_id
+        metrics = calculate_team_metrics(team.id)
+        team_metrics[team.team_number] = metrics
+    
     # Create team-event mapping for client-side filtering
     team_event_mapping = {}
     for team in all_teams:
         team_event_mapping[team.team_number] = [event.id for event in team.events]
+        
+    # Create a JSON representation of all teams for use in JavaScript
+    all_teams_data = []
+    for team in all_teams:
+        team_data = {
+            'teamNumber': team.team_number,
+            'teamName': team.team_name or "Unknown",
+            'displayText': f"{team.team_number} - {team.team_name or 'Unknown'}",
+            'points': team_metrics.get(team.team_number, {}).get('total_points', 0)
+        }
+        all_teams_data.append(team_data)
+    
+    all_teams_json = json.dumps(all_teams_data)
     
     # Get selected teams from query parameters if any
     selected_team_numbers = request.args.getlist('teams', type=int)
@@ -301,8 +322,10 @@ def index():
                           plots=plots,
                           game_config=game_config,
                           all_teams=all_teams,
+                          all_teams_json=all_teams_json,
                           all_events=all_events,
                           selected_team_numbers=selected_team_numbers,
                           selected_event_id=selected_event_id,
                           selected_metric=selected_metric,
-                          team_event_mapping=team_event_mapping)
+                          team_event_mapping=team_event_mapping,
+                          team_metrics=team_metrics)

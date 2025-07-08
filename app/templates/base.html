@@ -287,11 +287,28 @@
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li>
                                     <div class="px-3 py-2">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                                        <div class="form-check form-switch d-flex align-items-center">
+                                            <input class="form-check-input me-2" type="checkbox" id="darkModeToggle">
                                             <label class="form-check-label d-flex align-items-center" for="darkModeToggle">
-                                                <i class="fas fa-moon me-2 text-secondary"></i> Dark Mode
+                                                <i class="fas fa-moon me-2 text-primary" id="darkModeIcon"></i> 
+                                                <span id="darkModeLabel">Dark Mode</span>
                                             </label>
+                                            <style>
+                                                .form-switch .form-check-input {
+                                                    height: 1.2rem;
+                                                    width: 2.2rem;
+                                                    cursor: pointer;
+                                                }
+                                                .form-check-label {
+                                                    cursor: pointer;
+                                                }
+                                                .dark-mode #darkModeIcon {
+                                                    color: #ffc107 !important;
+                                                }
+                                                .dark-mode #darkModeLabel {
+                                                    color: #e6e6e6;
+                                                }
+                                            </style>
                                         </div>
                                     </div>
                                 </li>
@@ -402,23 +419,61 @@
             const darkModeToggle = document.getElementById('darkModeToggle');
             const body = document.body;
             
-            // Check for user's preference in localStorage
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            // Check for system preference first, then user's localStorage preference
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const storedPreference = localStorage.getItem('darkMode');
+            
+            // Set initial state based on user preference (if set) or system preference
+            const isDarkMode = storedPreference !== null ? storedPreference === 'true' : prefersDarkMode;
             
             // Set initial state
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const darkModeLabel = document.getElementById('darkModeLabel');
+            
             if (isDarkMode) {
                 body.classList.add('dark-mode');
                 darkModeToggle.checked = true;
+                darkModeIcon.classList.remove('fa-moon');
+                darkModeIcon.classList.add('fa-sun');
+                darkModeLabel.textContent = 'Light Mode';
             }
             
             // Toggle dark mode on change
             darkModeToggle.addEventListener('change', function() {
+                const darkModeIcon = document.getElementById('darkModeIcon');
+                const darkModeLabel = document.getElementById('darkModeLabel');
+                
                 if (this.checked) {
                     body.classList.add('dark-mode');
                     localStorage.setItem('darkMode', 'true');
+                    darkModeIcon.classList.remove('fa-moon');
+                    darkModeIcon.classList.add('fa-sun');
+                    darkModeLabel.textContent = 'Light Mode';
                 } else {
                     body.classList.remove('dark-mode');
                     localStorage.setItem('darkMode', 'false');
+                    darkModeIcon.classList.remove('fa-sun');
+                    darkModeIcon.classList.add('fa-moon');
+                    darkModeLabel.textContent = 'Dark Mode';
+                }
+                
+                // Force refresh computedStyle to ensure all dark mode styles are applied
+                document.documentElement.style.display='none';
+                document.documentElement.offsetHeight;
+                document.documentElement.style.display='';
+            });
+            
+            // Listen for system preference changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                // Only change if user hasn't set a preference
+                if (localStorage.getItem('darkMode') === null) {
+                    if (e.matches) {
+                        body.classList.add('dark-mode');
+                        darkModeToggle.checked = true;
+                    } else {
+                        body.classList.remove('dark-mode');
+                        darkModeToggle.checked = false;
+                    }
                 }
             });
             
@@ -432,6 +487,9 @@
             });
         });
     </script>
+    
+    <!-- Dark mode handlers -->
+    <script src="{{ url_for('static', filename='js/dark-mode-handlers.js') }}"></script>
     
     {% block scripts %}{% endblock %}
     {% block extra_js %}{% endblock %}

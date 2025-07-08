@@ -7,6 +7,7 @@ body {
     flex-direction: column;
     background-color: #f8f9fa;
     font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .footer {
@@ -728,15 +729,29 @@ body {
 
 /* Dark mode theme variables */
 .dark-mode {
-    --navbar-bg: #212529;
+    --navbar-bg: #1e2124;
     --primary: #3d8bfd;
     --primary-light: #1c4a87;
     --primary-dark: #6ea8fe;
     --light: #343a40;
     --dark: #f8f9fa;
+    --text-main: #e6e6e6;
+    --text-muted: #b0b0b0;
+    --card-bg: #2d3338;
+    --card-border: #444;
+    --card-header: #252a30;
+    --table-bg: #252a30;
+    --table-stripe: #2d3338;
+    --btn-light-bg: #3a4147;
+    --btn-light-text: #e6e6e6;
+    --btn-light-hover: #4a515a;
+    --badge-bg: #3a4147;
+    --badge-text: #e6e6e6;
+    --alliance-card-border: #1c71d8;
+    --team-slot-bg: #252a30;
     color-scheme: dark;
     background-color: #121212 !important;
-    color: #f8f9fa !important;
+    color: var(--text-main) !important;
 }
 
 .dark-mode .navbar {
@@ -790,8 +805,8 @@ body {
 }
 
 .dark-mode .game-badge .badge {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: rgba(255, 255, 255, 0.9) !important;
+    background-color: var(--badge-bg) !important;
+    color: var(--badge-text) !important;
     border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
@@ -802,7 +817,7 @@ body {
 }
 
 .dark-mode .dropdown-item {
-    color: #f8f9fa;
+    color: var(--text-main);
 }
 
 .dark-mode .dropdown-item:hover {
@@ -811,7 +826,7 @@ body {
 }
 
 .dark-mode .dropdown-item.active {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(61, 139, 253, 0.2);
     color: #ffffff;
 }
 
@@ -820,7 +835,7 @@ body {
 }
 
 .dark-mode .dropdown-header {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-muted);
 }
 
 .dark-mode .navbar-actions {
@@ -828,1160 +843,865 @@ body {
 }
 
 .dark-mode .card {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal styling for dark mode */
+.dark-mode .modal-content {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+.dark-mode .modal-header {
+    border-bottom-color: var(--card-border);
+}
+
+.dark-mode .modal-footer {
+    border-top-color: var(--card-border);
+}
+
+/* Ensure modal header in wipe database dialog respects dark mode */
+.dark-mode .modal-header.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.dark-mode .modal-header .btn-close {
+    filter: brightness(2);
+}
+
+/* Form elements within modals in dark mode */
+.dark-mode .modal .form-check-input {
     background-color: #2d3338;
-    border-color: #444;
-}
-
-.dark-mode .dropdown-menu {
-    background-color: #2d3338;
-    border-color: #444;
-}
-
-.dark-mode .dropdown-item {
-    color: #f8f9fa;
-}
-
-.dark-mode .dropdown-item:hover,
-.dark-mode .dropdown-item:focus {
-    background-color: #3a4147;
-    color: #ffffff;
-}
-
-.dark-mode .table {
-    color: #f8f9fa;
-}
-
-.dark-mode .table-striped tbody tr:nth-of-type(odd) {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.dark-mode .footer {
-    background-color: #212529;
-    border-top: 1px solid #444;
-}
-
-.dark-mode .btn-outline-secondary {
-    color: #adb5bd;
     border-color: #6c757d;
 }
 
-.dark-mode .form-control {
-    background-color: #343a40;
-    border-color: #495057;
-    color: #f8f9fa;
+.dark-mode .modal .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
 }
 
-/* Base Layout */
-html, body {
-    min-height: 100vh;
+.dark-mode .modal .form-check-label {
+    color: var(--text-main);
 }
 
-body {
-    font-family: var(--font-family-base);
-    background-color: #f5f7fa;
-    display: flex;
-    flex-direction: column;
+.dark-mode .modal .alert-danger {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: rgba(220, 53, 69, 0.3);
+    color: #f8d7da;
 }
 
-.app-header {
-    font-family: var(--font-family-headings);
-    position: sticky;
-    top: 0;
-    z-index: 1030;
+/* Select2 dropdowns in dark mode */
+.dark-mode .select2-container .select2-selection--single,
+.dark-mode .select2-container .select2-selection--multiple {
+    background-color: #2d3338;
+    border-color: #444;
+    color: var(--text-main);
 }
 
-.navbar {
-    background-color: var(--navbar-bg);
-    padding: 0.75rem 0;
-    transition: all var(--transition-speed) ease-in-out;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-    backdrop-filter: blur(8px);
+.dark-mode .select2-container--bootstrap-5 .select2-selection {
+    background-color: #2d3338;
+    border-color: #444;
+    color: var(--text-main);
 }
 
-.navbar-brand {
-    font-weight: 700;
-    font-size: 1.25rem;
-    transition: transform var(--transition-speed) ease-in-out;
+.dark-mode .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    color: var(--text-main);
 }
 
-.navbar-brand:hover {
-    transform: translateY(-1px);
+.dark-mode .select2-container--bootstrap-5 .select2-dropdown {
+    background-color: #2d3338;
+    border-color: #444;
 }
 
-.brand-icon {
-    font-size: 1.5rem;
-    color: var(--primary);
-    margin-right: 0.5rem;
+.dark-mode .select2-container--bootstrap-5 .select2-dropdown .select2-results__option {
+    color: var(--text-main);
 }
 
-.brand-text {
-    font-family: var(--font-family-headings);
+.dark-mode .select2-container--bootstrap-5 .select2-dropdown .select2-results__option--highlighted[aria-selected] {
+    background-color: rgba(61, 139, 253, 0.2);
+    color: #ffffff;
 }
 
-.navbar-toggler {
-    border: none !important;
-    padding: 0.5rem;
-    font-size: 1.2rem;
-    transition: all var(--transition-speed) ease-in-out;
-}
-
-.navbar-toggler:focus {
-    box-shadow: none;
-}
-
-.navbar-toggler:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 0.375rem;
-}
-
-.nav-link {
-    position: relative;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    transition: all var(--transition-speed) ease-in-out;
-    margin: 0 0.125rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-}
-
-.nav-link:hover {
-    background-color: rgba(13, 110, 253, 0.1);
-    transform: translateY(-1px);
-}
-
-.nav-link.active {
-    background-color: rgba(13, 110, 253, 0.15);
-    color: var(--primary) !important;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
-}
-
-.nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 2px;
-    background-color: var(--primary);
-    border-radius: 1px;
-}
-
-.nav-icon {
-    margin-right: 0.5rem;
-    font-size: 1rem;
-    width: 1.25rem;
-    text-align: center;
-}
-
-.nav-text {
-    white-space: nowrap;
-}
-
-.navbar-actions {
-    gap: 0.5rem;
-}
-
-.navbar-actions .btn {
-    border-radius: 0.5rem;
-    font-weight: 500;
-    transition: all var(--transition-speed) ease-in-out;
-}
-
-.navbar-actions .btn:hover {
-    transform: translateY(-1px);
-}
-
-.game-badge .badge {
-    font-size: 0.8rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 1rem;
-    font-weight: 500;
-}
-
-/* Dropdowns */
-.dropdown-menu-animated {
-    animation: fadeInUp 0.25s ease-out;
-    border: none;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    border-radius: 0.75rem;
-    padding: 0.5rem 0;
-    margin-top: 0.5rem;
-}
-
-.dropdown-item {
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    align-items: center;
-    transition: all var(--transition-speed) ease-in-out;
-    border-radius: 0;
-    font-weight: 500;
-}
-
-.dropdown-item:hover {
-    background-color: rgba(13, 110, 253, 0.08);
-    transform: translateX(4px);
-}
-
-.dropdown-item.active {
-    background-color: rgba(13, 110, 253, 0.15);
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.dropdown-item .nav-icon {
-    width: 1.25rem;
-    text-align: center;
-    margin-right: 0.75rem;
-}
-
-.dropdown-divider {
-    margin: 0.5rem 1rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.dropdown-header {
-    padding: 0.75rem 1.5rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-@keyframes fadeInUp {
-    from { 
-        opacity: 0; 
-        transform: translateY(-8px); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Main Content Area */
-main {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    flex: 1 0 auto;
-}
-
-.page-title {
-    font-family: var(--font-family-headings);
-    font-weight: 700;
-    color: var(--dark);
-    margin-bottom: 0.5rem;
-    font-size: 2rem;
-}
-
-.page-subtitle {
-    color: var(--secondary);
-    margin-bottom: 1.5rem;
-}
-
-.dark-mode .page-title {
-    color: var(--light);
-}
-
-/* Cards */
-.card {
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    transition: transform var(--transition-speed) ease-in-out, box-shadow var(--transition-speed) ease-in-out;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-    border: none;
-}
-
-.card:hover {
-    box-shadow: var(--card-shadow-hover);
-}
-
-.card-interactive:hover {
-    transform: translateY(-5px);
-}
-
-.card-header {
-    font-weight: 500;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    background-color: rgba(0, 0, 0, 0.02);
+.dark-mode .select2-container--bootstrap-5 .select2-dropdown .select2-results__option[aria-selected=true] {
+    background-color: rgba(61, 139, 253, 0.3);
 }
 
 .dark-mode .card-header {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--card-header);
+    border-bottom-color: var(--card-border);
+    color: var(--text-main) !important;
 }
 
-.card-icon {
-    font-size: 2rem;
-    color: var(--primary);
+/* Enhanced gradient elements for dark mode */
+
+/* Card header gradients */
+.dark-mode .bg-gradient-primary {
+    background: linear-gradient(45deg, #0d52bd, #3d8bfd) !important;
+    color: white !important;
 }
 
-/* Background gradients */
-.bg-gradient-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+.dark-mode .bg-gradient-success {
+    background: linear-gradient(45deg, #157347, #20c997) !important;
+    color: white !important;
 }
 
-.bg-gradient-success {
-    background: linear-gradient(135deg, var(--success), #146c43);
+.dark-mode .bg-gradient-info {
+    background: linear-gradient(45deg, #0891b2, #0dcaf0) !important;
+    color: white !important;
 }
 
-.bg-gradient-danger {
-    background: linear-gradient(135deg, var(--danger), #b02a37);
+/* Fix for colored text in headers */
+.dark-mode .card-header .text-white {
+    color: white !important;
 }
 
-.bg-gradient-warning {
-    background: linear-gradient(135deg, var(--warning), #d39e00);
-}
-
-.bg-gradient-info {
-    background: linear-gradient(135deg, var(--info), #0aa2c0);
-}
-
-.bg-gradient-dark {
-    background: linear-gradient(135deg, var(--dark), #1a1e21);
-}
-
-/* Stats Dashboard */
-.stat-card {
-    display: flex;
-    align-items: center;
-    padding: 1.25rem;
-    background-color: #ffffff;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    transition: transform var(--transition-speed) ease-in-out, 
-                box-shadow var(--transition-speed) ease-in-out;
-    margin-bottom: 1rem;
-    overflow: hidden;
-    position: relative;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--card-shadow-hover);
-}
-
+/* Improved dashboard styling for special UI elements */
 .dark-mode .stat-card {
-    background-color: #2d3338;
+    background: linear-gradient(135deg, var(--card-bg), var(--card-header));
+    transition: all 0.3s ease;
 }
 
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background-color: var(--primary);
+.dark-mode .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-.stat-icon {
-    width: 3.5rem;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    margin-right: 1rem;
-    background-color: rgba(13, 110, 253, 0.1);
-    flex-shrink: 0;
-}
-
-.stat-icon i {
-    font-size: 1.75rem;
-    color: var(--primary);
-}
-
-.stat-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-}
-
-.stat-label {
-    color: var(--secondary);
-    font-size: 0.875rem;
-    white-space: nowrap;
-}
-
-/* Empty state styling */
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-}
-
-.empty-state i {
-    opacity: 0.5;
-    margin-bottom: 1rem;
-}
-
-.empty-state h5 {
-    margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-    margin-bottom: 1.5rem;
-}
-
-/* Alliance Indicator */
-.alliance-indicator {
-    transition: all var(--transition-speed) ease;
-    border-left: 5px solid transparent;
-}
-
-.alliance-indicator:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.alliance-details {
-    max-width: 60%;
-    overflow: hidden;
-}
-
-/* Alliance Colors */
-.alliance-red {
-    background-color: var(--red-alliance-bg);
-    border-left-color: var(--red-alliance);
-}
-
-.alliance-blue {
-    background-color: var(--blue-alliance-bg);
-    border-left-color: var(--blue-alliance);
-}
-
-.alliance-red-text {
-    color: var(--red-alliance);
-}
-
-.alliance-blue-text {
-    color: var(--blue-alliance);
-}
-
-/* Match Phases */
-.phase-auto {
-    border-left: 4px solid var(--auto-color);
-}
-
-.phase-auto .card-body {
-    background-color: rgba(253, 126, 20, 0.03);
-}
-
-.phase-teleop {
-    border-left: 4px solid var(--teleop-color);
-}
-
-.phase-teleop .card-body {
-    background-color: rgba(13, 110, 253, 0.03);
-}
-
-.phase-endgame {
-    border-left: 4px solid var(--endgame-color);
-}
-
-.phase-endgame .card-body {
-    background-color: rgba(25, 135, 84, 0.03);
-}
-
-/* Points display with animation */
-.points-value {
-    transition: all 0.3s ease-in-out;
-}
-
-.points-updating {
-    animation: pulse 0.5s ease-in-out;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-/* Scouting Form */
-.scouting-form {
-    counter-reset: section;
-}
-
-.form-section {
-    position: relative;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    background-color: #ffffff;
-    box-shadow: var(--card-shadow);
-}
-
-.dark-mode .form-section {
-    background-color: #2d3338;
-}
-
-.form-section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.dark-mode .form-section-header {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-}
-
-.form-section-header::before {
-    counter-increment: section;
-    content: counter(section);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    background-color: var(--primary);
-    color: white;
-    border-radius: 50%;
-    margin-right: 0.75rem;
-    font-weight: 600;
-}
-
-.form-section-title {
-    margin: 0;
-    font-weight: 600;
-}
-
-/* Counter inputs */
-.counter-container {
-    display: flex;
-    align-items: center;
-    max-width: 280px;
-    margin: 0 auto;
-}
-
-.counter-input {
-    width: 70px;
-    text-align: center;
+/* Consistent styling for data tools section */
+.dark-mode .list-group-flush {
     border-radius: 0;
-    margin: 0 -1px;
-    font-weight: 500;
-    font-size: 1.2rem;
-    border-left: 0;
+}
+
+.dark-mode .list-group-flush .list-group-item {
     border-right: 0;
+    border-left: 0;
+    border-color: var(--card-border);
 }
 
-.btn-counter {
-    width: 48px;
-    height: 48px;
+/* Improved hover effects for list items in dark mode */
+.dark-mode .list-group-item-action:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Fix for buttons in dark mode */
+.dark-mode .btn-light {
+    background-color: var(--btn-light-bg);
+    border-color: var(--card-border);
+    color: var(--text-main);
+}
+
+/* Improve readability of links in dark mode */
+.dark-mode a:not(.btn):not(.dropdown-item):not(.nav-link):not(.list-group-item) {
+    color: #6ea8fe;
+}
+
+.dark-mode a:not(.btn):not(.dropdown-item):not(.nav-link):hover {
+    color: #9ec5fe;
+}
+
+/* Fix for nested cards and database management cards in dark mode */
+.dark-mode .card .card {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+.dark-mode .card .card-body {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+}
+
+.dark-mode .card .card-title {
+    color: var(--text-main);
+}
+
+.dark-mode .card-text.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Game Configuration window fixes */
+.dark-mode .list-group-item-action {
+    color: var(--text-main);
+}
+
+.dark-mode .bg-gradient-primary.text-white {
+    color: white !important; 
+}
+
+/* Fix nested borders for card in cards */
+.dark-mode .card .border {
+    border-color: var(--card-border) !important;
+}
+
+/* Fix nested card body backgrounds */
+.dark-mode .card .card .card-body {
+    background-color: #252a30;
+}
+
+/* Fix for the database management windows */
+.dark-mode .row.g-3 .card {
+    background-color: #252a30;
+    border-color: var(--card-border);
+}
+
+/* Ensure card backgrounds are consistent */
+.dark-mode .card-header + .card-body {
+    background-color: var(--card-bg);
+}
+
+/* Fix alert backgrounds in dark mode */
+.dark-mode .alert-info {
+    background-color: rgba(13, 202, 240, 0.15);
+    border-color: rgba(13, 202, 240, 0.3);
+    color: #8fddeb;
+}
+
+/* Fix font weight in cards */
+.dark-mode .fw-bold {
+    color: var(--text-main) !important;
+}
+
+/* Fix for list-group in Game Configuration */
+.dark-mode .list-group-flush .list-group-item {
+    background-color: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+}
+
+.dark-mode .list-group-flush .list-group-item:hover {
+    background-color: #343a40;
+}
+
+/* Fix dropdown button in Game Configuration header */
+.dark-mode .card-header.bg-gradient-primary .btn-light {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: transparent;
+    color: white;
+}
+
+.dark-mode .card-header.bg-gradient-primary .btn-light:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Fix for database management card headers */
+.dark-mode .card-header {
+    background-color: var(--card-header);
+}
+
+/* Fix for nested alert boxes */
+.dark-mode .card .alert {
+    border: 1px solid;
+}
+
+/* Fix specifically for database management nested cards */
+.dark-mode .row.g-3 > .col-md-6 > .card {
+    background-color: #252a30 !important;
+}
+
+.dark-mode .row.g-3 > .col-md-6 > .card .card-body {
+    background-color: #252a30 !important;
+}
+
+/* Fix for buttons inside these cards */
+.dark-mode .row.g-3 > .col-md-6 > .card .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.dark-mode .row.g-3 > .col-md-6 > .card .btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+/* Stronger background enforcement for list group items */
+.dark-mode .list-group-item {
+    background-color: var(--card-bg) !important;
+}
+
+/* Fix specifically for the game configuration card */
+.dark-mode .card-header.bg-gradient-primary + .card-body {
     padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
 }
 
-.counter-pulse {
-    animation: counterPulse 0.3s ease-in-out;
+.dark-mode .card-header.bg-gradient-primary + .card-body .list-group-flush .list-group-item {
+    background-color: var(--card-bg) !important;
 }
 
-@keyframes counterPulse {
-    0% { background-color: transparent; }
-    50% { background-color: rgba(13, 110, 253, 0.1); }
-    100% { background-color: transparent; }
+/* Important overrides for stubborn elements */
+.dark-mode .card,
+.dark-mode .card-header,
+.dark-mode .card-body,
+.dark-mode .list-group-item,
+.dark-mode .list-group-flush,
+.dark-mode .card .card {
+    color: var(--text-main) !important;
 }
 
-/* Form switch styling */
-.form-check-input:checked {
-    background-color: var(--primary);
-    border-color: var(--primary);
+/* Ensuring background colors are properly applied */
+.dark-mode .card {
+    background-color: var(--card-bg) !important;
 }
 
-.form-check-input:focus {
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+/* Fix specifically for white backgrounds in nested cards */
+.dark-mode .card-body .card {
+    background-color: #252a30 !important;
 }
 
-.form-switch .form-check-input {
-    width: 3em;
-    height: 1.5em;
+/* Make all card bodies in dark mode have consistent background */
+.dark-mode div.card-body {
+    background-color: var(--card-bg) !important;
 }
 
-/* Rating stars */
-.rating-container {
-    display: flex;
-    justify-content: flex-start;
-    margin: 0.5rem 0;
+/* Comprehensive fixes for all windows in dark mode */
+
+/* Fix any remaining white backgrounds */
+.dark-mode .bg-white,
+.dark-mode .bg-light {
+    background-color: var(--card-bg) !important;
+}
+
+/* Fix for any containers that might be white */
+.dark-mode .container .card,
+.dark-mode .container-fluid .card,
+.dark-mode .row .card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* Fix specific card types that might be stuck in light mode */
+.dark-mode .data-card,
+.dark-mode .match-card,
+.dark-mode .team-card,
+.dark-mode .dashboard-card,
+.dark-mode .stat-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-main) !important;
+}
+
+/* Fix for all card bodies regardless of nesting */
+.dark-mode .card .card-body,
+.dark-mode .card-body {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+}
+
+/* Fix for card headers regardless of context */
+.dark-mode .card .card-header,
+.dark-mode .card-header {
+    background-color: var(--card-header) !important;
+    border-bottom-color: var(--card-border) !important;
+    color: var(--text-main) !important;
+}
+
+/* Exception for gradient headers which should keep their gradient */
+.dark-mode .card-header.bg-gradient-primary,
+.dark-mode .card-header.bg-gradient-success,
+.dark-mode .card-header.bg-gradient-info,
+.dark-mode .card-header.bg-gradient-warning,
+.dark-mode .card-header.bg-gradient-danger {
+    color: white !important;
+}
+
+/* Fix all list groups regardless of context */
+.dark-mode .list-group,
+.dark-mode .list-group-item,
+.dark-mode .list-group-flush,
+.dark-mode .list-group-flush .list-group-item {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-main) !important;
 }
 
-.rating-star {
-    font-size: 1.75rem;
-    color: #d4d4d4;
-    cursor: pointer;
-    margin-right: 0.5rem;
-    transition: all 0.2s ease-in-out;
-    padding: 0.125rem;
+/* Fix hover state for list group items */
+.dark-mode .list-group-item:hover,
+.dark-mode .list-group-item-action:hover {
+    background-color: #343a40 !important;
 }
 
-.rating-star:hover,
-.rating-star.active {
-    color: var(--warning);
-    transform: scale(1.1);
+/* Fix form elements in all contexts */
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background-color: #343a40 !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-main) !important;
 }
 
-.rating-star.active ~ .rating-star {
-    color: var(--warning);
+/* Fix config display areas */
+.dark-mode .config-json {
+    background-color: #252a30 !important;
+    color: #e6e6e6 !important;
 }
 
-.rating-star:hover ~ .rating-star {
-    color: var(--warning);
-    opacity: 0.7;
+/* Fix any code displays or pre elements */
+.dark-mode pre,
+.dark-mode code {
+    background-color: #252a30 !important;
+    color: #e6e6e6 !important;
+    border-color: var(--card-border) !important;
 }
 
-@keyframes starIn {
-    0% { transform: scale(0.8); opacity: 0.5; }
-    100% { transform: scale(1); opacity: 1; }
+/* Fix tables in all contexts */
+.dark-mode table,
+.dark-mode .table {
+    color: var(--text-main) !important;
 }
 
-.animate-star {
-    animation: starIn 0.3s ease-in-out;
+.dark-mode .table th {
+    background-color: var(--card-header) !important;
 }
 
-.dark-mode .rating-star {
-    color: #555;
+.dark-mode .table td {
+    background-color: transparent !important;
+    border-color: var(--card-border) !important;
 }
 
-/* Match period tabs */
-.match-period-tabs {
-    display: flex;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    background-color: rgba(0, 0, 0, 0.03);
-    margin-bottom: 1.5rem;
+/* Fix for Bootstrap backgrounds */
+.dark-mode .bg-light {
+    background-color: var(--card-bg) !important;
 }
 
-.dark-mode .match-period-tabs {
-    background-color: rgba(255, 255, 255, 0.05);
+.dark-mode .border-light {
+    border-color: var(--card-border) !important;
 }
 
-.match-period-tab {
-    flex: 1;
-    padding: 1rem 0.75rem;
-    text-align: center;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-speed) ease-in-out;
-    border: none;
-    background: transparent;
-    border-bottom: 3px solid transparent;
+/* Fix any white background overlays */
+.dark-mode .overlay,
+.dark-mode .card-img-overlay {
+    background-color: rgba(0, 0, 0, 0.7) !important;
 }
 
-.match-period-tab:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+/* Fix any accordion components */
+.dark-mode .accordion-item,
+.dark-mode .accordion-header,
+.dark-mode .accordion-button {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--card-border) !important;
 }
 
-.dark-mode .match-period-tab:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+.dark-mode .accordion-button:not(.collapsed) {
+    background-color: var(--card-header) !important;
+    color: var(--text-main) !important;
 }
 
-.match-period-tab.active {
-    border-bottom-color: var(--primary);
-    color: var(--primary);
-    background-color: rgba(13, 110, 253, 0.05);
+/* Fix all nested elements inside .row and .col that might have white backgrounds */
+.dark-mode .row [class*="col"] .card,
+.dark-mode .row [class*="col"] .alert,
+.dark-mode .row [class*="col"] .list-group,
+.dark-mode .row [class*="col"] .list-group-item {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-main) !important;
 }
 
-.auto-tab.active {
-    border-bottom-color: var(--auto-color);
-    color: var(--auto-color);
-    background-color: rgba(253, 126, 20, 0.05);
+/* Fix for badges to maintain their colors */
+.dark-mode .badge.bg-primary,
+.dark-mode .badge.bg-secondary,
+.dark-mode .badge.bg-success,
+.dark-mode .badge.bg-danger,
+.dark-mode .badge.bg-warning,
+.dark-mode .badge.bg-info {
+    color: white !important;
 }
 
-.teleop-tab.active {
-    border-bottom-color: var(--teleop-color);
-    color: var(--teleop-color);
-    background-color: rgba(13, 110, 253, 0.05);
+.dark-mode .badge.bg-warning,
+.dark-mode .badge.bg-info {
+    color: #212529 !important;
 }
 
-.endgame-tab.active {
-    border-bottom-color: var(--endgame-color);
-    color: var(--endgame-color);
-    background-color: rgba(25, 135, 84, 0.05);
+/* Fix for any tabs or pills */
+.dark-mode .nav-tabs,
+.dark-mode .nav-pills {
+    border-color: var(--card-border) !important;
 }
 
-/* Match period sections */
-.match-period-section {
-    transition: opacity 0.3s ease-in-out;
+.dark-mode .nav-tabs .nav-link,
+.dark-mode .nav-pills .nav-link {
+    color: var(--text-muted) !important;
 }
 
-/* Footer */
-.footer {
-    background-color: #ffffff;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 1.25rem 0;
-    margin-top: auto;
+.dark-mode .nav-tabs .nav-link.active,
+.dark-mode .nav-pills .nav-link.active {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border-color: var(--card-border) !important;
 }
 
-/* Chart Container */
-.chart-container {
-    height: 400px;
-    width: 100%;
-    margin-bottom: 2rem;
-    transition: all 0.3s ease-in-out;
+/* Fix for any progress bars */
+.dark-mode .progress {
+    background-color: #343a40 !important;
 }
 
-.chart-container:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+/* Fix for any tooltips */
+.dark-mode .tooltip .tooltip-inner {
+    background-color: #212529 !important;
+    color: white !important;
 }
+
+/* Fix for dashboard notification or info boxes */
+.dark-mode .alert {
+    background-color: #252a30 !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-main) !important;
+}
+
+/* Exception for color-specific alerts */
+.dark-mode .alert-primary {
+    background-color: rgba(13, 110, 253, 0.15) !important;
+    border-color: rgba(13, 110, 253, 0.4) !important;
+    color: #9ec5fe !important;
+}
+
+.dark-mode .alert-success {
+    background-color: rgba(25, 135, 84, 0.15) !important;
+    border-color: rgba(25, 135, 84, 0.4) !important;
+    color: #75b798 !important;
+}
+
+.dark-mode .alert-info {
+    background-color: rgba(13, 202, 240, 0.15) !important;
+    border-color: rgba(13, 202, 240, 0.4) !important;
+    color: #8fddeb !important;
+}
+
+.dark-mode .alert-warning {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+    border-color: rgba(255, 193, 7, 0.4) !important;
+    color: #ffd660 !important;
+}
+
+.dark-mode .alert-danger {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+    border-color: rgba(220, 53, 69, 0.4) !important;
+    color: #ea868f !important;
+}
+
+/* Comprehensive text color fixes for dark mode */
 
-/* QR Code */
-.qr-container {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    max-width: 350px;
-    margin: 0 auto;
-    text-align: center;
-    transition: all 0.3s ease;
+/* Fix all text to be white in dark mode */
+.dark-mode,
+.dark-mode p,
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode span:not(.badge),
+.dark-mode label,
+.dark-mode td,
+.dark-mode th,
+.dark-mode div:not(.badge),
+.dark-mode li {
+    color: var(--text-main) !important;
 }
 
-.qr-container:hover {
-    transform: scale(1.02);
-    box-shadow: var(--card-shadow-hover);
+/* Fix muted text to be visible but still subdued */
+.dark-mode .text-muted,
+.dark-mode small,
+.dark-mode .small,
+.dark-mode .text-secondary {
+    color: var(--text-muted) !important;
 }
 
-.dark-mode .qr-container {
-    background-color: #ffffff;
+/* Exceptions for badges and buttons to maintain their colors */
+.dark-mode .badge,
+.dark-mode .btn:not(.btn-outline-secondary):not(.btn-outline-primary):not(.btn-light) {
+    /* Let these elements keep their specific colors */
+    color: initial;
 }
 
-#qrcode {
-    margin: 0 auto;
-    max-width: 100%;
+/* Fix specifically colored text */
+.dark-mode .text-dark {
+    color: var(--text-main) !important;
 }
 
-#qrcode img,
-#qrcode canvas {
-    max-width: 100%;
-    height: auto !important;
-    margin: 0 auto;
+.dark-mode .text-light {
+    color: var(--text-main) !important;
 }
 
-/* Data tables */
-.table-container {
-    margin-bottom: 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    overflow: hidden;
-    background-color: #ffffff;
+.dark-mode .text-black {
+    color: var(--text-main) !important;
 }
 
-.dark-mode .table-container {
-    background-color: #2d3338;
+.dark-mode .text-black-50 {
+    color: rgba(230, 230, 230, 0.8) !important;
 }
 
-.table {
-    margin-bottom: 0;
+/* Ensure specific colored text maintain visibility */
+.dark-mode .text-primary {
+    color: #6ea8fe !important;
 }
 
-.table thead th {
-    background-color: rgba(0, 0, 0, 0.02);
-    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.8125rem;
-    letter-spacing: 0.03em;
-    padding: 0.75rem 1rem;
+.dark-mode .text-success {
+    color: #75b798 !important;
 }
 
-.table tbody td {
-    padding: 0.75rem 1rem;
-    vertical-align: middle;
+.dark-mode .text-info {
+    color: #6edff6 !important;
 }
 
-.table-hover tbody tr:hover {
-    background-color: rgba(13, 110, 253, 0.03);
+.dark-mode .text-warning {
+    color: #ffda6a !important;
 }
 
-.dark-mode .table thead th {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+.dark-mode .text-danger {
+    color: #ea868f !important;
 }
 
-.dark-mode .table-hover tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+/* Fix specifically for card titles and headings */
+.dark-mode .card-title,
+.dark-mode .card-header h5,
+.dark-mode .card-header h6 {
+    color: var(--text-main) !important;
 }
 
-/* Page transitions */
-.page-transition {
-    animation: fadeOut 0.3s ease-in-out forwards;
+/* Fix icons to be properly visible */
+.dark-mode .fas,
+.dark-mode .far,
+.dark-mode .fab,
+.dark-mode .fa,
+.dark-mode .bi {
+    color: inherit;
 }
 
-.page-loaded {
-    animation: fadeIn 0.3s ease-in-out;
+/* Fix for text inside buttons */
+.dark-mode .btn-outline-secondary,
+.dark-mode .btn-outline-primary,
+.dark-mode .btn-light {
+    color: var(--text-main) !important;
 }
 
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0.5; }
+.dark-mode .btn-primary,
+.dark-mode .btn-success,
+.dark-mode .btn-danger,
+.dark-mode .btn-warning,
+.dark-mode .btn-info {
+    color: white !important;
 }
 
-/* Toast notifications */
-.toast {
-    border-radius: var(--border-radius);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    opacity: 1;
-    transition: all 0.3s ease;
+/* Exception for warning and info buttons which should have dark text */
+.dark-mode .btn-warning,
+.dark-mode .btn-info {
+    color: #212529 !important;
 }
 
-.toast-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 0.75rem 1rem;
+/* Fix for team and match selection dropdowns */
+.dark-mode select.form-select {
+    background-color: #343a40 !important;
+    color: var(--text-main) !important;
+    border-color: var(--card-border) !important;
 }
 
-.toast.hide {
-    animation: slideOut 0.3s ease-in-out forwards;
+.dark-mode select.form-select option {
+    background-color: #343a40 !important;
+    color: var(--text-main) !important;
 }
 
-@keyframes slideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
+/* Fix for select2 and other enhanced dropdown widgets */
+.dark-mode .select2-container--default .select2-selection--single,
+.dark-mode .select2-container--default .select2-selection--multiple {
+    background-color: #343a40 !important;
+    border-color: var(--card-border) !important;
 }
 
-/* Button styles */
-.btn {
-    transition: all 0.2s ease-in-out;
+.dark-mode .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--text-main) !important;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.dark-mode .select2-dropdown {
+    background-color: #343a40 !important;
+    border-color: var(--card-border) !important;
 }
 
-.btn-pulse {
-    animation: btnPulse 0.5s ease-in-out;
+.dark-mode .select2-search__field {
+    background-color: #2d3338 !important;
+    color: var(--text-main) !important;
+    border-color: var(--card-border) !important;
 }
 
-@keyframes btnPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+.dark-mode .select2-container--default .select2-results__option {
+    color: var(--text-main) !important;
 }
 
-/* Loading overlay */
-#loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.dark-mode .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--primary) !important;
+    color: white !important;
 }
 
-#loading-overlay:not(.d-none) {
-    opacity: 1;
+.dark-mode .select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #495057 !important;
 }
 
-.dark-mode #loading-overlay {
-    background-color: rgba(0, 0, 0, 0.8);
+/* Fix for dropdown menus in forms */
+.dark-mode .dropdown-menu.show {
+    background-color: #343a40 !important;
+    border-color: var(--card-border) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
 }
 
-.spinner-container {
-    text-align: center;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    animation: fadeIn 0.3s ease-in-out;
+/* Fix for Bootstrap's custom selects */
+.dark-mode .custom-select,
+.dark-mode .custom-select option {
+    background-color: #343a40 !important;
+    color: var(--text-main) !important;
+    border-color: var(--card-border) !important;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .page-title {
-        font-size: 1.75rem;
-    }
-    
-    .nav-link {
-        padding: 0.5rem 0.75rem;
-    }
-    
-    .navbar-brand {
-        font-size: 1.1rem;
-    }
-    
-    .brand-icon {
-        font-size: 1.3rem;
-    }
-    
-    .dropdown-menu {
-        margin-top: 0.25rem;
-    }
+/* Fix for dropdown arrows */
+.dark-mode .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e6e6e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
 }
 
-@media (max-width: 768px) {
-    .stat-value {
-        font-size: 1.5rem;
-    }
-    
-    .stat-icon {
-        width: 3rem;
-        height: 3rem;
-    }
-    
-    .stat-icon i {
-        font-size: 1.5rem;
-    }
-    
-    .chart-container {
-        height: 300px;
-    }
-    
-    .match-period-tab {
-        padding: 0.5rem;
-        font-size: 0.875rem;
-    }
-    
-    .navbar {
-        padding: 0.5rem 0;
-    }
-    
-    .navbar-brand {
-        font-size: 1rem;
-    }
-    
-    .brand-icon {
-        font-size: 1.2rem;
-        margin-right: 0.375rem;
-    }
-    
-    .nav-link {
-        padding: 0.75rem 1rem;
-        margin: 0.125rem 0;
-        border-radius: 0.375rem;
-    }
-    
-    .nav-icon {
-        margin-right: 0.75rem;
-        font-size: 1.1rem;
-    }
-    
-    .dropdown-menu {
-        border-radius: 0.5rem;
-        margin-top: 0.125rem;
-    }
-    
-    .dropdown-item {
-        padding: 0.875rem 1.25rem;
-    }
-    
-    .navbar-actions {
-        margin-top: 0.5rem;
-        padding-top: 0.5rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.08);
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .navbar-collapse {
-        margin-top: 0.5rem;
-    }
-    
-    .game-badge {
-        margin-top: 0.5rem;
-    }
+/* Fix for team or match dropdown lists */
+.dark-mode [class*="team-list"],
+.dark-mode [class*="match-list"],
+.dark-mode [id*="team-select"],
+.dark-mode [id*="match-select"],
+.dark-mode [id*="teamSelect"],
+.dark-mode [id*="matchSelect"] {
+    background-color: #343a40 !important;
+    color: var(--text-main) !important;
 }
 
-/* Accessibility improvements */
-.navbar-nav .nav-link:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
+/* Fix for any datalists */
+.dark-mode datalist,
+.dark-mode datalist option {
+    background-color: #343a40 !important;
+    color: var(--text-main) !important;
 }
 
-.dropdown-item:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: -2px;
+/* Fix for autocomplete dropdowns */
+.dark-mode .ui-autocomplete {
+    background-color: #343a40 !important;
+    color: var(--text-main) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
 }
 
-.navbar-actions .btn:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
+.dark-mode .ui-autocomplete .ui-menu-item,
+.dark-mode .ui-autocomplete .ui-menu-item-wrapper {
+    color: var(--text-main) !important;
 }
 
-/* Enhanced interaction states */
-.nav-link.dropdown-toggle::after {
-    margin-left: 0.5rem;
-    transition: transform var(--transition-speed) ease-in-out;
+.dark-mode .ui-autocomplete .ui-menu-item-wrapper.ui-state-active {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
 }
 
-.nav-link.dropdown-toggle[aria-expanded="true"]::after {
-    transform: rotate(180deg);
+/* Fix for typeahead dropdowns */
+.dark-mode .tt-menu,
+.dark-mode .tt-dropdown-menu {
+    background-color: #343a40 !important;
+    color: var(--text-main) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
 }
 
-.navbar-actions .dropdown-toggle::after {
-    margin-left: 0.5rem;
-    transition: transform var(--transition-speed) ease-in-out;
+.dark-mode .tt-suggestion {
+    color: var(--text-main) !important;
 }
 
-.navbar-actions .dropdown-toggle[aria-expanded="true"]::after {
-    transform: rotate(180deg);
+.dark-mode .tt-suggestion:hover,
+.dark-mode .tt-suggestion.tt-cursor {
+    background-color: var(--primary) !important;
+    color: white !important;
 }
 
-/* Badge animations */
-.game-badge .badge {
-    transition: all var(--transition-speed) ease-in-out;
+/* Fix for multiselect dropdowns */
+.dark-mode .multiselect-container {
+    background-color: #343a40 !important;
+    border-color: var(--card-border) !important;
 }
 
-.game-badge .badge:hover {
-    transform: scale(1.05);
+.dark-mode .multiselect-container li a,
+.dark-mode .multiselect-container li a label {
+    color: var(--text-main) !important;
 }
 
-/* Loading state for nav items */
-.nav-link.loading {
-    opacity: 0.6;
-    pointer-events: none;
+.dark-mode .multiselect-container li a:hover,
+.dark-mode .multiselect-container li.active a {
+    background-color: var(--primary) !important;
+    color: white !important;
 }
 
-.nav-link.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    margin-top: -0.5rem;
-    border: 2px solid transparent;
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+/* Fix for chosen dropdowns */
+.dark-mode .chosen-container .chosen-drop {
+    background-color: #343a40 !important;
+    border-color: var(--card-border) !important;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.dark-mode .chosen-container .chosen-results li {
+    color: var(--text-main) !important;
 }
 
-/* Notification indicator */
-.nav-link .notification-badge {
-    position: absolute;
-    top: 0.25rem;
-    right: 0.25rem;
-    background-color: var(--danger);
-    color: white;
-    border-radius: 50%;
-    width: 0.75rem;
-    height: 0.75rem;
-    font-size: 0.6rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    border: 2px solid var(--navbar-bg);
+.dark-mode .chosen-container .chosen-results li.highlighted {
+    background-color: var(--primary) !important;
+    color: white !important;
 }
 
-.dark-mode .nav-link .notification-badge {
-    border-color: var(--navbar-bg);
+/* Fix for browser default autocomplete backgrounds */
+.dark-mode input:-webkit-autofill,
+.dark-mode input:-webkit-autofill:hover,
+.dark-mode input:-webkit-autofill:focus,
+.dark-mode select:-webkit-autofill,
+.dark-mode select:-webkit-autofill:hover,
+.dark-mode select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #343a40 inset !important;
+    -webkit-text-fill-color: var(--text-main) !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Mobile menu improvements */
+/* Fix for Select2 on mobile devices */
 @media (max-width: 767.98px) {
-    .navbar-collapse {
-        background-color: var(--navbar-bg);
-        border-radius: 0.5rem;
-        margin-top: 0.5rem;
-        padding: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    .select2-container--bootstrap-5 .select2-dropdown {
+        width: 100% !important;
+        max-width: 100vw !important;
+        left: 0 !important;
+        right: 0 !important;
     }
     
-    .dark-mode .navbar-collapse {
-        background-color: #2d3338;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    .select2-dropdown-large {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: 10% !important;
+        margin: 0 auto;
     }
     
-    .navbar-nav .nav-item {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    .select2-container--bootstrap-5.select2-container--open .select2-dropdown {
+        transform: none !important;
+        left: 0 !important;
     }
     
-    .navbar-nav .nav-item:last-child {
-        border-bottom: none;
+    .select2-search--dropdown .select2-search__field {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
     }
     
-    .dark-mode .navbar-nav .nav-item {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
+    .select2-results__options {
+        max-height: 60vh !important;
+        overflow-y: auto !important;
     }
     
-    .navbar-nav .dropdown-menu {
-        position: static;
-        float: none;
-        width: auto;
-        margin-top: 0;
-        background-color: rgba(0, 0, 0, 0.02);
-        border: none;
-        border-radius: 0.25rem;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark-mode .navbar-nav .dropdown-menu {
-        background-color: rgba(255, 255, 255, 0.05);
-        box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1);
-    }
-    
-    .navbar-nav .dropdown-item {
-        padding-left: 2rem;
-        font-size: 0.9rem;
+    .select2-selection--multiple .select2-selection__rendered {
+        white-space: normal !important;
+        display: block !important;
     }
 }
 
-/* Smooth scrolling for anchor links */
-html {
-    scroll-behavior: smooth;
+/* Fix for ensuring the dropdown always has space */
+.select2-container--open .select2-dropdown--below {
+    margin-top: 3px;
+    border-top: 1px solid #aaa;
 }
 
-/* High contrast mode improvements */
-@media (prefers-contrast: high) {
-    .navbar {
-        border-bottom: 2px solid currentColor;
-    }
-    
-    .nav-link {
-        border: 1px solid transparent;
-    }
-    
-    .nav-link:hover,
-    .nav-link.active {
-        border-color: currentColor;
-    }
-    
-    .dropdown-menu {
-        border: 2px solid currentColor;
-    }
-}
-
-/* Reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-    .navbar,
-    .nav-link,
-    .dropdown-menu,
-    .dropdown-item,
-    .navbar-actions .btn {
-        transition: none;
-    }
-    
-    .dropdown-menu-animated {
-        animation: none;
-    }
-    
-    .nav-link.dropdown-toggle::after,
-    .navbar-actions .dropdown-toggle::after {
-        transition: none;
-    }
+/* Fix for dropdown positioning */
+.select2-results {
+    position: relative;
+    overflow-y: auto;
 }

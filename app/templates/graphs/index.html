@@ -38,7 +38,8 @@
                                 {% for team in all_teams %}
                                 <option value="{{ team.team_number }}" 
                                         {% if team.team_number in selected_team_numbers %}selected{% endif %}
-                                        data-team-name="{{ team.team_name or 'Unknown' }}">
+                                        data-team-name="{{ team.team_name or 'Unknown' }}"
+                                        data-points="{{ team_metrics.get(team.team_number, {}).get('total_points', 0) }}">
                                     {{ team.team_number }} - {{ team.team_name or 'Unknown' }}
                                 </option>
                                 {% endfor %}
@@ -208,6 +209,7 @@
 
 {% block scripts %}
 <script>
+    // @ts-nocheck - Disable TypeScript checking for Jinja templates
     // Team-event mapping for dynamic filtering
     const teamEventMapping = {{ team_event_mapping | tojson }};
     
@@ -220,6 +222,9 @@
                 allowClear: true,
                 closeOnSelect: false,
                 width: '100%',
+                dropdownParent: $('#team-selection-form').parent(), // Ensure dropdown is contained within the form's parent
+                dropdownCssClass: 'select2-dropdown-large', // Custom class for styling the dropdown
+                selectionCssClass: 'select2-selection-large', // Custom class for the selection area
                 templateResult: function(team) {
                     if (!team.id) return team.text;
                     
@@ -241,6 +246,12 @@
                     } else {
                         return team.text;
                     }
+                },
+                // Fix for mobile devices
+                sorter: function(data) {
+                    return data.sort(function(a, b) {
+                        return (a.text > b.text) ? 1 : -1;
+                    });
                 }
             });
         }
@@ -257,15 +268,9 @@
         initializeTeamSelect();
         
         // Store all teams data for filtering
-        const allTeamsData = [
-            {% for team in all_teams %}
-            {
-                teamNumber: {{ team.team_number }},
-                teamName: '{{ team.team_name or "Unknown" }}',
-                displayText: '{{ team.team_number }} - {{ team.team_name or "Unknown" }}'
-            }{% if not loop.last %},{% endif %}
-            {% endfor %}
-        ];
+        // Convert the server-provided JSON string to a JavaScript object
+        const allTeamsData = {{ all_teams_json|safe }};
+        
         
         // Function to filter teams based on selected event
         function filterTeamsByEvent() {
@@ -395,14 +400,29 @@
         });
         
         $('#select-top-teams').click(function() {
-            // Select first 8 currently visible teams (after filtering)
-            const topVisibleValues = [];
-            $('#teams option').each(function(index) {
-                if ($(this).val() && index < 8) { // Skip empty values and limit to 8
-                    topVisibleValues.push($(this).val());
+            // Get the currently selected metric for sorting
+            const selectedMetric = $('#metric').val();
+            
+            // Get all teams and their data
+            const teamOptions = [];
+            $('#teams option').each(function() {
+                if ($(this).val()) {
+                    teamOptions.push({
+                        value: $(this).val(),
+                        text: $(this).text(),
+                        points: parseFloat($(this).data('points') || 0)
+                    });
                 }
             });
-            $('#teams').val(topVisibleValues).trigger('change');
+            
+            // Sort teams by points (descending)
+            teamOptions.sort((a, b) => b.points - a.points);
+            
+            // Select top 8 teams by points
+            const topTeamValues = teamOptions.slice(0, 8).map(team => team.value);
+            
+            // Update selection
+            $('#teams').val(topTeamValues).trigger('change');
         });
         
         // Form submission with loading state
