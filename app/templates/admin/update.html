@@ -13,6 +13,7 @@
                 <h5 class="mb-0">
                     <i class="fas fa-sync-alt me-2"></i> Application Update
                 </h5>
+                <small class="text-light">Current Version: {{ current_version }}</small>
             </div>
             <div class="card-body">
                 <div class="alert alert-danger">
@@ -33,6 +34,36 @@
                     <strong>Additional Requirements:</strong> This will update the application to the latest version from Git. 
                     Please make sure you have committed any local changes before proceeding.
                     A server restart will be required after the update.
+                </div>
+
+                <!-- Version Status -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title">Version Information</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Current Version:</strong> {{ current_version }}
+                            </div>
+                            <div class="col-md-6">
+                                {% if update_available %}
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        Update Available: {{ remote_version }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>
+                                        Up to Date
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button id="checkUpdatesBtn" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-search me-2"></i> Check for Updates
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <p class="mb-4">
@@ -96,12 +127,48 @@
 document.addEventListener('DOMContentLoaded', function() {
     const startUpdateBtn = document.getElementById('startUpdateBtn');
     const clearConsoleBtn = document.getElementById('clearConsoleBtn');
+    const checkUpdatesBtn = document.getElementById('checkUpdatesBtn');
     const consoleElement = document.getElementById('console');
     const updateStatus = document.getElementById('updateStatus');
     const updateSuccess = document.getElementById('updateSuccess');
     const updateError = document.getElementById('updateError');
     
     let eventSource = null;
+
+    // Function to check for updates
+    function checkForUpdates() {
+        checkUpdatesBtn.disabled = true;
+        checkUpdatesBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Checking...';
+        
+        fetch('{{ url_for("admin.check_for_updates") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.update_available) {
+                location.reload(); // Reload to show updated status
+            } else {
+                checkUpdatesBtn.innerHTML = '<i class="fas fa-check me-2"></i> Up to Date';
+                setTimeout(() => {
+                    checkUpdatesBtn.innerHTML = '<i class="fas fa-search me-2"></i> Check for Updates';
+                    checkUpdatesBtn.disabled = false;
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            console.error('Error checking for updates:', error);
+            checkUpdatesBtn.innerHTML = '<i class="fas fa-times me-2"></i> Error';
+            setTimeout(() => {
+                checkUpdatesBtn.innerHTML = '<i class="fas fa-search me-2"></i> Check for Updates';
+                checkUpdatesBtn.disabled = false;
+            }, 2000);
+        });
+    }
 
     // Function to start the update process
     function startUpdate() {
@@ -212,6 +279,9 @@ document.addEventListener('DOMContentLoaded', function() {
             startUpdate();
         }
     });
+    
+    // Attach click event handler to the Check Updates button
+    checkUpdatesBtn.addEventListener('click', checkForUpdates);
     
     // Attach click event handler to the Clear Console button
     clearConsoleBtn.addEventListener('click', function() {

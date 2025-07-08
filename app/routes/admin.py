@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, current_app, Response, stream_with_context, request, jsonify
 from flask_login import login_required
 from app.routes.auth import admin_required
+from app.utils.version_manager import VersionManager
 import subprocess
 import sys
 import os
@@ -13,7 +14,34 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @admin_required
 def update_page():
     """Render the application update page"""
-    return render_template('admin/update.html')
+    version_manager = VersionManager()
+    current_version = version_manager.get_current_version()
+    update_available = version_manager.is_update_available()
+    remote_version = version_manager.get_remote_version()
+    
+    return render_template('admin/update.html', 
+                         current_version=current_version,
+                         update_available=update_available,
+                         remote_version=remote_version)
+
+@bp.route('/update/check', methods=['POST'])
+@login_required
+@admin_required
+def check_for_updates():
+    """Check for available updates"""
+    version_manager = VersionManager()
+    
+    # Try GitHub first, then fall back to git
+    has_update, message = version_manager.check_for_updates_github()
+    if not has_update and "Not a GitHub repository" in message:
+        has_update, message = version_manager.check_for_updates_git()
+    
+    return jsonify({
+        'update_available': has_update,
+        'message': message,
+        'current_version': version_manager.get_current_version(),
+        'remote_version': version_manager.get_remote_version()
+    })
 
 @bp.route('/update/run', methods=['GET', 'POST'])
 @login_required
@@ -122,3 +150,29 @@ def run_update():
     response.headers['Cache-Control'] = 'no-cache'
     response.headers['X-Accel-Buffering'] = 'no'
     return response
+
+@bp.route('/update/version', methods=['POST'])
+@login_required
+@admin_required
+def update_version():
+    """Update version information after successful update"""
+    try:
+        data = request.get_json()
+        new_version = data.get('version')
+        
+        version_manager = VersionManager()
+        if new_version:
+            version_manager.set_current_version(new_version)
+        else:
+            version_manager.update_version_info(mark_updated=True)
+        
+        return jsonify({
+            'success': True,
+            'current_version': version_manager.get_current_version(),
+            'message': 'Version updated successfully'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error updating version: {str(e)}'
+        }), 500
