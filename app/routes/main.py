@@ -303,12 +303,22 @@ def save_simple_config():
             'key_metrics': key_metrics
         }
         
+        # Update preferred API source
+        updated_config['preferred_api_source'] = request.form.get('preferred_api_source', 'first')
+        
         # Update API settings if provided
-        if request.form.get('api_username'):
+        if request.form.get('api_username') or request.form.get('api_auth_token'):
             updated_config['api_settings'] = {
-                'username': request.form.get('api_username'),
+                'username': request.form.get('api_username', ''),
                 'auth_token': request.form.get('api_auth_token', ''),
                 'base_url': request.form.get('api_base_url', 'https://frc-api.firstinspires.org')
+            }
+        
+        # Update TBA API settings if provided
+        if request.form.get('tba_auth_key') or request.form.get('tba_base_url'):
+            updated_config['tba_api_settings'] = {
+                'auth_key': request.form.get('tba_auth_key', ''),
+                'base_url': request.form.get('tba_base_url', 'https://www.thebluealliance.com/api/v3')
             }
         
         # Save the configuration

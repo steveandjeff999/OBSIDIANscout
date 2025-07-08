@@ -197,9 +197,15 @@ def create_default_game_config(config_path):
         "alliance_size": 3,
         "match_types": ["Practice", "Qualification", "Playoff"],
         "scouting_stations": 6,
+        "preferred_api_source": "first",
         "api_settings": {
+            "username": "",
             "auth_token": "",
             "base_url": "https://frc-api.firstinspires.org"
+        },
+        "tba_api_settings": {
+            "auth_key": "",
+            "base_url": "https://www.thebluealliance.com/api/v3"
         },
         "scoring_elements": [
             {

@@ -3,10 +3,20 @@ import json
 import os
 import base64
 from flask import current_app
+from .tba_api_utils import (
+    TBAApiError, get_tba_teams_at_event, get_tba_event_matches, 
+    get_tba_event_details, tba_team_to_db_format, tba_match_to_db_format,
+    tba_event_to_db_format, construct_tba_event_key, construct_tba_team_key
+)
 
 class ApiError(Exception):
     """Exception for API errors"""
     pass
+
+def get_preferred_api_source():
+    """Get preferred API source from config"""
+    game_config = current_app.config.get('GAME_CONFIG', {})
+    return game_config.get('preferred_api_source', 'first')  # Default to FIRST API
 
 def get_api_key():
     """Get API key from config"""
@@ -389,3 +399,203 @@ def get_event_details(event_code):
         raise ApiError(f"Request failed: {str(e)}")
     except Exception as e:
         raise ApiError(f"Error getting event details: {str(e)}")
+
+# Dual API Support Functions
+def get_teams_dual_api(event_code):
+    """Get teams from either FIRST API or TBA API based on configuration"""
+    preferred_source = get_preferred_api_source()
+    
+    try:
+        if preferred_source == 'tba':
+            print(f"Using TBA API for teams at event {event_code}")
+            # Convert event code to TBA format
+            game_config = current_app.config.get('GAME_CONFIG', {})
+            season = game_config.get('season', 2026)
+            tba_event_key = construct_tba_event_key(event_code, season)
+            
+            # Get teams from TBA
+            tba_teams = get_tba_teams_at_event(tba_event_key)
+            
+            # Convert to database format
+            teams_db_format = []
+            for tba_team in tba_teams:
+                team_data = tba_team_to_db_format(tba_team)
+                if team_data and team_data.get('team_number'):
+                    teams_db_format.append(team_data)
+            
+            return teams_db_format
+        else:
+            print(f"Using FIRST API for teams at event {event_code}")
+            # Use existing FIRST API function
+            api_teams = get_teams(event_code)
+            
+            # Convert to database format
+            teams_db_format = []
+            for api_team in api_teams:
+                team_data = api_to_db_team_conversion(api_team)
+                if team_data and team_data.get('team_number'):
+                    teams_db_format.append(team_data)
+            
+            return teams_db_format
+    
+    except (ApiError, TBAApiError) as e:
+        print(f"Primary API ({preferred_source}) failed: {str(e)}")
+        
+        # Try fallback API
+        fallback_source = 'first' if preferred_source == 'tba' else 'tba'
+        print(f"Trying fallback API: {fallback_source}")
+        
+        try:
+            if fallback_source == 'tba':
+                game_config = current_app.config.get('GAME_CONFIG', {})
+                season = game_config.get('season', 2026)
+                tba_event_key = construct_tba_event_key(event_code, season)
+                
+                tba_teams = get_tba_teams_at_event(tba_event_key)
+                
+                teams_db_format = []
+                for tba_team in tba_teams:
+                    team_data = tba_team_to_db_format(tba_team)
+                    if team_data and team_data.get('team_number'):
+                        teams_db_format.append(team_data)
+                
+                return teams_db_format
+            else:
+                api_teams = get_teams(event_code)
+                
+                teams_db_format = []
+                for api_team in api_teams:
+                    team_data = api_to_db_team_conversion(api_team)
+                    if team_data and team_data.get('team_number'):
+                        teams_db_format.append(team_data)
+                
+                return teams_db_format
+        
+        except (ApiError, TBAApiError) as fallback_error:
+            print(f"Fallback API ({fallback_source}) also failed: {str(fallback_error)}")
+            raise ApiError(f"Both APIs failed. Primary ({preferred_source}): {str(e)}, Fallback ({fallback_source}): {str(fallback_error)}")
+
+def get_matches_dual_api(event_code):
+    """Get matches from either FIRST API or TBA API based on configuration"""
+    preferred_source = get_preferred_api_source()
+    
+    try:
+        if preferred_source == 'tba':
+            print(f"Using TBA API for matches at event {event_code}")
+            # Convert event code to TBA format
+            game_config = current_app.config.get('GAME_CONFIG', {})
+            season = game_config.get('season', 2026)
+            tba_event_key = construct_tba_event_key(event_code, season)
+            
+            # Get matches from TBA
+            tba_matches = get_tba_event_matches(tba_event_key)
+            
+            # Convert to database format (we'll need event_id later)
+            matches_db_format = []
+            for tba_match in tba_matches:
+                match_data = tba_match_to_db_format(tba_match, None)  # event_id will be set later
+                if match_data:
+                    matches_db_format.append(match_data)
+            
+            return matches_db_format
+        else:
+            print(f"Using FIRST API for matches at event {event_code}")
+            # Use existing FIRST API function
+            api_matches = get_matches(event_code)
+            
+            # Convert to database format
+            matches_db_format = []
+            for api_match in api_matches:
+                match_data = api_to_db_match_conversion(api_match, None)  # event_id will be set later
+                if match_data:
+                    matches_db_format.append(match_data)
+            
+            return matches_db_format
+    
+    except (ApiError, TBAApiError) as e:
+        print(f"Primary API ({preferred_source}) failed: {str(e)}")
+        
+        # Try fallback API
+        fallback_source = 'first' if preferred_source == 'tba' else 'tba'
+        print(f"Trying fallback API: {fallback_source}")
+        
+        try:
+            if fallback_source == 'tba':
+                game_config = current_app.config.get('GAME_CONFIG', {})
+                season = game_config.get('season', 2026)
+                tba_event_key = construct_tba_event_key(event_code, season)
+                
+                tba_matches = get_tba_event_matches(tba_event_key)
+                
+                matches_db_format = []
+                for tba_match in tba_matches:
+                    match_data = tba_match_to_db_format(tba_match, None)
+                    if match_data:
+                        matches_db_format.append(match_data)
+                
+                return matches_db_format
+            else:
+                api_matches = get_matches(event_code)
+                
+                matches_db_format = []
+                for api_match in api_matches:
+                    match_data = api_to_db_match_conversion(api_match, None)
+                    if match_data:
+                        matches_db_format.append(match_data)
+                
+                return matches_db_format
+        
+        except (ApiError, TBAApiError) as fallback_error:
+            print(f"Fallback API ({fallback_source}) also failed: {str(fallback_error)}")
+            raise ApiError(f"Both APIs failed. Primary ({preferred_source}): {str(e)}, Fallback ({fallback_source}): {str(fallback_error)}")
+
+def get_event_details_dual_api(event_code):
+    """Get event details from either FIRST API or TBA API based on configuration"""
+    preferred_source = get_preferred_api_source()
+    
+    try:
+        if preferred_source == 'tba':
+            print(f"Using TBA API for event details: {event_code}")
+            # Convert event code to TBA format
+            game_config = current_app.config.get('GAME_CONFIG', {})
+            season = game_config.get('season', 2026)
+            tba_event_key = construct_tba_event_key(event_code, season)
+            
+            # Get event details from TBA
+            tba_event = get_tba_event_details(tba_event_key)
+            
+            if tba_event:
+                # Convert to database format
+                return tba_event_to_db_format(tba_event)
+            else:
+                return None
+        else:
+            print(f"Using FIRST API for event details: {event_code}")
+            # Use existing FIRST API function
+            return get_event_details(event_code)
+    
+    except (ApiError, TBAApiError) as e:
+        print(f"Primary API ({preferred_source}) failed: {str(e)}")
+        
+        # Try fallback API
+        fallback_source = 'first' if preferred_source == 'tba' else 'tba'
+        print(f"Trying fallback API: {fallback_source}")
+        
+        try:
+            if fallback_source == 'tba':
+                game_config = current_app.config.get('GAME_CONFIG', {})
+                season = game_config.get('season', 2026)
+                tba_event_key = construct_tba_event_key(event_code, season)
+                
+                tba_event = get_tba_event_details(tba_event_key)
+                
+                if tba_event:
+                    return tba_event_to_db_format(tba_event)
+                else:
+                    return None
+            else:
+                return get_event_details(event_code)
+        
+        except (ApiError, TBAApiError) as fallback_error:
+            print(f"Fallback API ({fallback_source}) also failed: {str(fallback_error)}")
+            raise ApiError(f"Both APIs failed. Primary ({preferred_source}): {str(e)}, Fallback ({fallback_source}): {str(fallback_error)}")

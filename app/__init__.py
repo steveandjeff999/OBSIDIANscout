@@ -59,6 +59,17 @@ def create_app(test_config=None):
                 api_settings = app.config['GAME_CONFIG']['api_settings']
                 app.config['API_KEY'] = api_settings.get('auth_token', '')
                 app.config['API_BASE_URL'] = api_settings.get('base_url', 'https://frc-api.firstinspires.org')
+            
+            # Set TBA API configuration
+            if 'tba_api_settings' in app.config['GAME_CONFIG']:
+                tba_settings = app.config['GAME_CONFIG']['tba_api_settings']
+                app.config['TBA_API_KEY'] = tba_settings.get('auth_key', '')
+            
+            # Set TBA API configuration
+            if 'tba_api_settings' in app.config['GAME_CONFIG']:
+                tba_settings = app.config['GAME_CONFIG']['tba_api_settings']
+                app.config['TBA_API_KEY'] = tba_settings.get('auth_key', '')
+                app.config['TBA_BASE_URL'] = tba_settings.get('base_url', 'https://www.thebluealliance.com/api/v3')
     except Exception as e:
         print(f"Error loading game configuration: {e}")
         app.config['GAME_CONFIG'] = {
@@ -66,7 +77,8 @@ def create_app(test_config=None):
             "game_name": "Default Game",
             "alliance_size": 3,
             "match_types": ["Practice", "Qualification", "Playoff"],
-            "scouting_stations": 6
+            "scouting_stations": 6,
+            "preferred_api_source": "first"
         }
     
     # Initialize database
@@ -127,6 +139,10 @@ def create_app(test_config=None):
     app.register_blueprint(activity.activity_bp)
     app.register_blueprint(assistant.bp)
     app.register_blueprint(integrity.integrity_bp)
+    
+    # Register API test blueprint (admin only)
+    from app.routes import api_test
+    app.register_blueprint(api_test.bp)
     
     # Create database tables (only if they don't exist)
     with app.app_context():

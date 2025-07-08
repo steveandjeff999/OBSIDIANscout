@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.routes.auth import analytics_required
 from app.models import Match, Event, Team, ScoutingData
 from app import db
-from app.utils.api_utils import get_matches, ApiError, api_to_db_match_conversion
+from app.utils.api_utils import get_matches, ApiError, api_to_db_match_conversion, get_matches_dual_api
 from app.utils.analysis import predict_match_outcome, get_match_details_with_teams
 from datetime import datetime
 
@@ -81,17 +81,17 @@ def sync_from_config():
             db.session.add(event)
             db.session.flush()  # Get the ID without committing yet
         
-        # Fetch matches from the API using the event code
-        api_matches = get_matches(event_code)
+        # Fetch matches from the dual API using the event code
+        match_data_list = get_matches_dual_api(event_code)
         
         # Track metrics for user feedback
         matches_added = 0
         matches_updated = 0
         
         # Process each match from the API
-        for api_match in api_matches:
-            # Convert API match format to our database format
-            match_data = api_to_db_match_conversion(api_match, event.id)
+        for match_data in match_data_list:
+            # Set the event_id for the match
+            match_data['event_id'] = event.id
             
             if not match_data:
                 continue

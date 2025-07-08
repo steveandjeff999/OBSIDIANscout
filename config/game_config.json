@@ -1,9 +1,14 @@
 {
   "alliance_size": 3,
+  "preferred_api_source": "tba",
   "api_settings": {
     "username": "your FIRST api username here",
     "auth_token": "your FIRST api auth token here",
     "base_url": "https://frc-api.firstinspires.org"
+  },
+  "tba_api_settings": {
+    "auth_key": "hae7pfixkaYpROTHhMx6XQ5qLkjT5v7jX7IymIp3sFadVOTsboxkSVJlYu4yoq9a",
+    "base_url": "https://www.thebluealliance.com/api/v3"
   },
   "auto_period": {
     "duration_seconds": 15,
@@ -88,7 +93,7 @@
       }
     ]
   },
-  "current_event_code": "MILSTEIN",
+  "current_event_code": "okok",
   "data_analysis": {
     "key_metrics": [
       {

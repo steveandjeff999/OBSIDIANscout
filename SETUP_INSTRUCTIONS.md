@@ -37,11 +37,34 @@
    - Add new users with different roles
    - Test the system by logging in with different user accounts
 
-7. **Important:** Set up your first API credentials:
-   - Navigate to the API configuration section in game_config.json
-   - Enter your first API username and key
-   - This is required for the application to function properly with external data sources
-   - Restart the program for changes to take effect
+7. **Important:** Set up your API credentials for automatic data syncing:
+   
+   **Dual API Support:** The platform now supports both FIRST API and The Blue Alliance API with automatic fallback.
+   
+   **Option 1 - The Blue Alliance API (Recommended):**
+   - Visit https://www.thebluealliance.com/account
+   - Create an account and generate a Read API key
+   - Go to Configuration > API Settings in the scouting platform
+   - Enter your TBA API key and set "The Blue Alliance API" as preferred source
+   
+   **Option 2 - FIRST API (Official):**
+   - Obtain credentials from the FIRST API portal
+   - Go to Configuration > API Settings in the scouting platform
+   - Enter your FIRST API username and auth token
+   
+   **Option 3 - Both APIs (Maximum Reliability):**
+   - Configure both APIs for automatic fallback
+   - Choose your preferred primary source
+   - System automatically falls back if primary fails
+   
+   **Testing:** Use the API Testing interface (Admin menu) to verify your configuration.
+   
+   For detailed API setup instructions, see `DUAL_API_README.md`
+
+8. **Optional:** Test API integration:
+   - Go to Admin menu > API Testing
+   - Run quick tests with sample event codes (e.g., 2024cala)
+   - Verify both primary and fallback APIs are working
 
 ## Role-based access:
 

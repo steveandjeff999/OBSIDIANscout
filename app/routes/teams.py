@@ -3,7 +3,7 @@ from flask_login import login_required
 from app.routes.auth import analytics_required
 from app.models import Team, Event, ScoutingData
 from app import db
-from app.utils.api_utils import get_teams, ApiError, api_to_db_team_conversion, get_event_details
+from app.utils.api_utils import get_teams, ApiError, api_to_db_team_conversion, get_event_details, get_teams_dual_api, get_event_details_dual_api
 from datetime import datetime
 import statistics
 
@@ -68,8 +68,8 @@ def sync_from_config():
         
         if not event:
             try:
-                # Try to get event details from API
-                event_details = get_event_details(event_code)
+                # Try to get event details from dual API
+                event_details = get_event_details_dual_api(event_code)
                 
                 # Convert date strings to datetime.date objects
                 start_date_str = event_details.get('dateStart')
@@ -111,17 +111,15 @@ def sync_from_config():
             db.session.add(event)
             db.session.commit()  # Commit to get the ID
 
-        # Fetch teams from the API using the event code
-        api_teams = get_teams(event_code)
+        # Fetch teams from the dual API using the event code
+        team_data_list = get_teams_dual_api(event_code)
         
         # Track metrics for user feedback
         teams_added = 0
         teams_updated = 0
         
         # Process each team from the API
-        for api_team in api_teams:
-            # Convert API team format to our database format
-            team_data = api_to_db_team_conversion(api_team)
+        for team_data in team_data_list:
             
             if not team_data or not team_data.get('team_number'):
                 continue
