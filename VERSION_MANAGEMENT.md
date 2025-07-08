@@ -8,10 +8,9 @@ The version information is stored in `app_config.json` at the root of the projec
 
 ```json
 {
-    "version": "1.0.0",
-    "last_updated": null,
+    "version": "a46e099",
+    "last_updated": "2025-07-08T19:07:00",
     "update_available": false,
-    "remote_version": null,
     "repository_url": "https://github.com/yourusername/your-repo.git",
     "branch": "main"
 }
@@ -19,10 +18,9 @@ The version information is stored in `app_config.json` at the root of the projec
 
 ### Configuration Options
 
-- **version**: Current application version (semantic versioning recommended)
+- **version**: Current application version (semantic version for releases, commit SHA for development)
 - **last_updated**: ISO timestamp of last update
 - **update_available**: Boolean indicating if an update is available
-- **remote_version**: Version available for update
 - **repository_url**: GitHub repository URL for checking releases
 - **branch**: Git branch to track for updates
 
@@ -46,8 +44,8 @@ The system supports multiple methods for checking updates, automatically falling
 
 2. **GitHub Commits** (automatic fallback):
    - If no releases are found, checks for new commits on the specified branch
-   - Uses commit timestamps to generate version numbers (YYYY.MM.DD.HHMM format)
-   - Includes short commit SHA for identification
+   - Compares commit SHAs directly for accurate version tracking
+   - Stores the short commit SHA (7 characters) as the version
 
 3. **Local Git** (final fallback):
    - If GitHub is unavailable, checks for new commits locally
@@ -67,7 +65,8 @@ Access the update interface at `/admin/update`:
 
 - **Single Config File**: All version information stored in one `app_config.json` file
 - **Smart Update Detection**: Automatically detects GitHub releases or commits
-- **Version Auto-Update**: Updates version number automatically after successful updates
+- **SHA-based Comparison**: Uses commit SHAs for accurate development version tracking
+- **Simplified Version Management**: Single version field eliminates confusion
 - **Fallback Systems**: Multiple methods ensure update checking works in various environments
 
 ### API Endpoints

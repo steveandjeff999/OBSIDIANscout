@@ -17,12 +17,10 @@ def update_page():
     version_manager = VersionManager()
     current_version = version_manager.get_current_version()
     update_available = version_manager.is_update_available()
-    remote_version = version_manager.get_remote_version()
     
     return render_template('admin/update.html', 
                          current_version=current_version,
-                         update_available=update_available,
-                         remote_version=remote_version)
+                         update_available=update_available)
 
 @bp.route('/update/check', methods=['POST'])
 @login_required
@@ -43,8 +41,7 @@ def check_for_updates():
     return jsonify({
         'update_available': has_update,
         'message': message,
-        'current_version': version_manager.get_current_version(),
-        'remote_version': version_manager.get_remote_version()
+        'current_version': version_manager.get_current_version()
     })
 
 @bp.route('/update/run', methods=['GET', 'POST'])
@@ -137,18 +134,9 @@ def run_update():
                 # Update version information after successful update
                 try:
                     version_manager = VersionManager()
-                    remote_version = version_manager.get_remote_version()
-                    if remote_version:
-                        # Extract version from remote_version (handle commit format)
-                        if '(' in remote_version:  # Format: "2025.07.08.1850 (0f36a88)"
-                            new_version = remote_version.split(' ')[0]
-                        else:
-                            new_version = remote_version
-                        version_manager.set_current_version(new_version)
-                        yield f"data: Updated version to {new_version}\n\n"
-                    else:
-                        version_manager.update_version_info(mark_updated=True)
-                        yield f"data: Marked update as completed\n\n"
+                    # Just mark the update as completed - version was already updated during check
+                    version_manager.update_version_info(mark_updated=True)
+                    yield f"data: Marked update as completed\n\n"
                 except Exception as e:
                     yield f"data: Warning: Could not update version info: {str(e)}\n\n"
                 

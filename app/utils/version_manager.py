@@ -27,7 +27,6 @@ class VersionManager:
                     "version": "1.0.0",
                     "last_updated": None,
                     "update_available": False,
-                    "remote_version": None,
                     "repository_url": "",
                     "branch": "main"
                 }
@@ -39,7 +38,6 @@ class VersionManager:
                 "version": "1.0.0",
                 "last_updated": None,
                 "update_available": False,
-                "remote_version": None,
                 "repository_url": "",
                 "branch": "main"
             }
@@ -105,13 +103,12 @@ class VersionManager:
                         # Compare versions
                         try:
                             if version.parse(remote_version) > version.parse(current_version):
-                                self.config['remote_version'] = remote_version
+                                self.config['version'] = remote_version
                                 self.config['update_available'] = True
                                 self.save_config()
                                 return True, f"Update available: {remote_version}"
                             else:
                                 self.config['update_available'] = False
-                                self.config['remote_version'] = remote_version
                                 self.save_config()
                                 return False, f"No updates available (latest: {remote_version})"
                         except Exception as ve:
@@ -142,34 +139,29 @@ class VersionManager:
             if response.status_code == 200:
                 commit_data = response.json()
                 latest_commit_sha = commit_data['sha'][:7]  # Short SHA
-                commit_date = commit_data['commit']['committer']['date']
-                
-                # Use commit date as version indicator
-                from datetime import datetime
-                commit_datetime = datetime.fromisoformat(commit_date.replace('Z', '+00:00'))
-                version_string = commit_datetime.strftime("%Y.%m.%d.%H%M")
                 
                 current_version = self.get_current_version()
                 
-                # If current version is older format, consider update available
-                try:
-                    version.parse(current_version)
-                    # Current version is semantic, update available if commit is newer
-                    self.config['remote_version'] = f"{version_string} ({latest_commit_sha})"
+                # Extract current commit SHA if version contains one
+                current_commit_sha = None
+                if '(' in current_version and ')' in current_version:
+                    # Format: "2025.07.08.1850 (0f36a88)" - extract the SHA
+                    current_commit_sha = current_version.split('(')[1].split(')')[0]
+                elif len(current_version) == 7 and all(c in '0123456789abcdef' for c in current_version.lower()):
+                    # Version is just a commit SHA
+                    current_commit_sha = current_version
+                
+                # Compare commit SHAs
+                if current_commit_sha != latest_commit_sha:
+                    # Update available - store just the commit SHA as version
+                    self.config['version'] = latest_commit_sha
                     self.config['update_available'] = True
                     self.save_config()
                     return True, f"New commits available: {latest_commit_sha}"
-                except:
-                    # Current version might be commit-based too
-                    if current_version != version_string:
-                        self.config['remote_version'] = f"{version_string} ({latest_commit_sha})"
-                        self.config['update_available'] = True
-                        self.save_config()
-                        return True, f"New commits available: {latest_commit_sha}"
-                    else:
-                        self.config['update_available'] = False
-                        self.save_config()
-                        return False, "No new commits"
+                else:
+                    self.config['update_available'] = False
+                    self.save_config()
+                    return False, "No new commits"
             else:
                 return False, f"Could not check commits: {response.status_code}"
         except Exception as e:
@@ -215,8 +207,8 @@ class VersionManager:
         return self.config.get('update_available', False)
     
     def get_remote_version(self):
-        """Get the remote version if available"""
-        return self.config.get('remote_version')
+        """Get the remote version if available - for backward compatibility"""
+        return None  # No longer using remote_version field
     
     def update_version_info(self, new_version=None, mark_updated=True):
         """Update version information after successful update"""
@@ -225,5 +217,4 @@ class VersionManager:
         if mark_updated:
             self.config['last_updated'] = datetime.now().isoformat()
             self.config['update_available'] = False
-            self.config['remote_version'] = None
         self.save_config()
