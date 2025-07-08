@@ -24,22 +24,20 @@ The version information is stored in `app_config.json` at the root of the projec
 
 ## How It Works
 
-This system uses **GitHub Releases only** for version management:
+This system uses the `app_config.json` file on GitHub for version management:
 
-1. **Your local version** stays exactly as you set it (e.g., `1.0.0.0`)
-2. **GitHub releases** are checked for newer versions using semantic versioning
+1. **Your local version** stays exactly as you set it in your local `app_config.json` (e.g., `1.0.0.0`)
+2. The system checks the **remote `app_config.json`** file on GitHub for its version field
 3. **Version comparison** uses the `packaging` library for accurate semantic version comparison
 4. **Automatic updates** download and install when a higher version is found
 
-### Creating Releases
+### Managing Version on GitHub
 
-To enable version checking, create releases on your GitHub repository:
+To enable version checking:
 
-1. Go to your GitHub repository
-2. Click "Releases" → "Create a new release"
-3. Tag version: `v1.0.0.1` (or `1.0.0.1`)
-4. Release title: `Version 1.0.0.1`
-5. Publish release
+1. Update the `app_config.json` file on GitHub with a higher version number
+2. Push the changes to the branch specified in your local config (default: `main`)
+3. The system will compare version numbers directly from this file
 
 The system will automatically detect when `1.0.0.1` > `1.0.0.0` and offer to update.
 
@@ -56,14 +54,14 @@ To update the current version manually:
 
 The system uses a simple and reliable approach:
 
-1. **GitHub Releases Only**: 
-   - Checks your GitHub repository for published releases
-   - Compares release version tags with your local version
+1. **Direct File Comparison**: 
+   - Fetches the `app_config.json` file directly from your GitHub repository
+   - Compares the version field with your local version
    - Uses semantic versioning for accurate comparison (1.0.0.1 > 1.0.0.0)
 
-2. **No Commit Tracking**:
-   - Does not track individual commits
-   - Only responds to official releases you publish
+2. **No Commit or Release Tracking**:
+   - Does not track individual commits or GitHub releases
+   - Only compares version numbers from the config files
    - Clean and predictable update behavior
 
 ### Admin Interface
@@ -79,10 +77,9 @@ Access the update interface at `/admin/update`:
 ### Automatic Features
 
 - **Single Config File**: All version information stored in one `app_config.json` file
-- **Smart Update Detection**: Automatically detects GitHub releases or commits
-- **SHA-based Comparison**: Uses commit SHAs for accurate development version tracking
+- **Direct Version Comparison**: Compares versions between local and remote config files
 - **Simplified Version Management**: Single version field eliminates confusion
-- **Fallback Systems**: Multiple methods ensure update checking works in various environments
+- **Reliable Updates**: Simple version comparison ensures predictable update behavior
 
 ### API Endpoints
 

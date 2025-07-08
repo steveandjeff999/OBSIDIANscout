@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, current_app, Response, stream_with
 from flask_login import login_required
 from app.routes.auth import admin_required
 from app.utils.version_manager import VersionManager
+from app.utils.remote_config import fetch_remote_config, is_remote_version_newer
 import subprocess
 import sys
 import os
@@ -16,7 +17,18 @@ def update_page():
     """Render the application update page"""
     version_manager = VersionManager()
     current_version = version_manager.get_current_version()
-    update_available = version_manager.is_update_available()
+    
+    # Get repository info from config
+    repo_url = version_manager.config.get('repository_url', '')
+    branch = version_manager.config.get('branch', 'main')
+    
+    # Try to fetch remote config to check for updates
+    remote_config = fetch_remote_config(repo_url, branch)
+    if remote_config:
+        remote_version = remote_config.get('version', '0.0.0.0')
+        update_available, _ = is_remote_version_newer(current_version, remote_version)
+    else:
+        update_available = False
     
     return render_template('admin/update.html', 
                          current_version=current_version,
@@ -29,14 +41,25 @@ def check_for_updates():
     """Check for available updates"""
     version_manager = VersionManager()
     
-    # Check GitHub releases only
-    has_update, message = version_manager.check_for_updates_github()
+    # Get current version and repository URL from local config
+    current_version = version_manager.get_current_version()
+    repo_url = version_manager.config.get('repository_url', '')
+    branch = version_manager.config.get('branch', 'main')
+    
+    # Fetch remote config using the new function
+    remote_config = fetch_remote_config(repo_url, branch)
+    
+    if remote_config:
+        remote_version = remote_config.get('version', '0.0.0.0')
+        has_update, message = is_remote_version_newer(current_version, remote_version)
+    else:
+        has_update, message = False, "Could not fetch remote version"
     
     return jsonify({
         'update_available': has_update,
         'message': message,
-        'current_version': version_manager.get_current_version(),
-        'latest_version': version_manager.get_latest_release_version()
+        'current_version': current_version,
+        'latest_version': remote_version if remote_config else "Unknown"
     })
 
 @bp.route('/update/run', methods=['GET', 'POST'])
@@ -129,11 +152,25 @@ def run_update():
                 # Update version information after successful update
                 try:
                     version_manager = VersionManager()
-                    success, msg = version_manager.update_to_latest_version()
-                    if success:
-                        yield f"data: {msg}\n\n"
+                    
+                    # Get repository info from config
+                    repo_url = version_manager.config.get('repository_url', '')
+                    branch = version_manager.config.get('branch', 'main')
+                    current_version = version_manager.get_current_version()
+                    
+                    # Fetch remote config to get latest version
+                    remote_config = fetch_remote_config(repo_url, branch)
+                    if remote_config and 'version' in remote_config:
+                        remote_version = remote_config['version']
+                        has_update, _ = is_remote_version_newer(current_version, remote_version)
+                        
+                        if has_update:
+                            version_manager.set_current_version(remote_version)
+                            yield f"data: Updated to version {remote_version}\n\n"
+                        else:
+                            yield f"data: Already at latest version {current_version}\n\n"
                     else:
-                        yield f"data: Version update info: {msg}\n\n"
+                        yield f"data: Could not fetch remote version information\n\n"
                 except Exception as e:
                     yield f"data: Warning: Could not update version info: {str(e)}\n\n"
                 

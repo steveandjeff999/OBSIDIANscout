@@ -61,9 +61,10 @@ class VersionManager:
         self.save_config()
     
     def check_for_updates_github(self):
-        """Check for updates from GitHub releases only"""
+        """Check for updates by comparing version in app_config.json from GitHub"""
         try:
             repo_url = self.config.get('repository_url', '')
+            branch = self.config.get('branch', 'main')
             if not repo_url:
                 return False, "Repository URL not configured"
             
@@ -80,16 +81,16 @@ class VersionManager:
                 else:
                     return False, "Invalid GitHub URL format"
                 
-                # Get latest release from GitHub API
-                api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
-                logger.info(f"Checking for updates at: {api_url}")
+                # Get app_config.json from GitHub raw content
+                raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/app_config.json"
+                logger.info(f"Checking for updates at: {raw_url}")
                 
                 try:
-                    response = requests.get(api_url, timeout=10)
+                    response = requests.get(raw_url, timeout=10)
                     
                     if response.status_code == 200:
-                        release_data = response.json()
-                        remote_version = release_data['tag_name'].lstrip('v')
+                        remote_config = response.json()
+                        remote_version = remote_config.get('version', '0.0.0.0')
                         
                         current_version = self.get_current_version()
                         
@@ -103,7 +104,7 @@ class VersionManager:
                             logger.error(f"Version comparison error: {ve}")
                             return False, f"Error comparing versions: {str(ve)}"
                     elif response.status_code == 404:
-                        return False, "No releases found on GitHub repository"
+                        return False, "app_config.json not found in GitHub repository."
                     else:
                         return False, f"GitHub API error: {response.status_code}"
                 except requests.exceptions.RequestException as e:
@@ -116,9 +117,10 @@ class VersionManager:
             return False, f"Error checking for updates: {str(e)}"
     
     def get_latest_release_version(self):
-        """Get the latest release version from GitHub"""
+        """Get the latest version from app_config.json on GitHub"""
         try:
             repo_url = self.config.get('repository_url', '')
+            branch = self.config.get('branch', 'main')
             if not repo_url or 'github.com' not in repo_url:
                 return None
             
@@ -131,14 +133,14 @@ class VersionManager:
                 owner = parts[-2]
                 repo = parts[-1]
                 
-                api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
-                response = requests.get(api_url, timeout=10)
+                raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/app_config.json"
+                response = requests.get(raw_url, timeout=10)
                 
                 if response.status_code == 200:
-                    release_data = response.json()
-                    return release_data['tag_name'].lstrip('v')
+                    remote_config = response.json()
+                    return remote_config.get('version', None)
         except Exception as e:
-            logger.error(f"Error getting latest release: {e}")
+            logger.error(f"Error getting latest version from GitHub: {e}")
         
         return None
     
@@ -148,7 +150,7 @@ class VersionManager:
         return has_update
     
     def update_to_latest_version(self):
-        """Update the local version to the latest GitHub release version"""
+        """Update the local version to the latest version from GitHub's app_config.json"""
         latest_version = self.get_latest_release_version()
         if latest_version:
             current_version = self.get_current_version()
@@ -162,3 +164,10 @@ class VersionManager:
                 return False, f"Error updating version: {str(e)}"
         else:
             return False, "Could not retrieve latest version"
+    
+    def update_version_info(self, mark_updated=True):
+        """Update version information"""
+        if mark_updated:
+            self.config['last_updated'] = datetime.now().isoformat()
+            self.save_config()
+        return True
