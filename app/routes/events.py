@@ -125,3 +125,35 @@ def sync():
     # Not implementing the full API sync here as it would require additional API utils
     flash('Event syncing not implemented in this version', 'warning')
     return redirect(url_for('events.index'))
+
+@bp.route('/set_current_event/<int:event_id>', methods=['GET'])
+def set_current_event(event_id):
+    """Set the current event in the game configuration"""
+    event = Event.query.get_or_404(event_id)
+    
+    # Update the game configuration
+    game_config = current_app.config.get('GAME_CONFIG', {})
+    game_config['current_event_code'] = event.code
+    
+    # Save the updated configuration to file
+    try:
+        import json
+        import os
+        
+        config_path = os.path.join(current_app.root_path, '..', 'config', 'game_config.json')
+        with open(config_path, 'w') as f:
+            json.dump(game_config, f, indent=2)
+        
+        # Update the app config as well
+        current_app.config['GAME_CONFIG'] = game_config
+        
+        flash(f'Current event set to: {event.name}', 'success')
+    except Exception as e:
+        flash(f'Error setting current event: {str(e)}', 'danger')
+    
+    # Redirect to the referring page or specified route
+    redirect_to = request.args.get('redirect_to')
+    if redirect_to:
+        return redirect(url_for(redirect_to))
+    else:
+        return redirect(url_for('events.index'))

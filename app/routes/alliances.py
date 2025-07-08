@@ -39,9 +39,17 @@ def emit_lists_update(event_id, list_data):
 @bp.route('/')
 def index():
     """Alliance selection main page"""
-    # Get the current event (most recent by default)
+    # Get all events ordered by date
     events = Event.query.order_by(Event.year.desc(), Event.start_date.desc()).all()
-    current_event = events[0] if events else None
+    
+    # Get current event from game config or fall back to most recent event
+    game_config = current_app.config.get('GAME_CONFIG', {})
+    current_event_code = game_config.get('current_event_code')
+    
+    if current_event_code:
+        current_event = Event.query.filter_by(code=current_event_code).first()
+    else:
+        current_event = events[0] if events else None
     
     if not current_event:
         flash('No events found. Please create an event first.', 'warning')
