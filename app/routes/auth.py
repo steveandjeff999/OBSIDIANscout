@@ -223,7 +223,31 @@ def system_check():
 @admin_required
 def admin_settings():
     """Admin settings page"""
-    return render_template('auth/admin_settings.html')
+    # Get version information for admin dashboard
+    update_available = False
+    current_version = None
+    
+    try:
+        from app.utils.remote_config import fetch_remote_config, is_remote_version_newer
+        from app.utils.version_manager import VersionManager
+        
+        # Get version info
+        version_manager = VersionManager()
+        current_version = version_manager.get_current_version()
+        repo_url = version_manager.config.get('repository_url', '')
+        branch = version_manager.config.get('branch', 'main')
+        
+        # Check for updates
+        remote_config = fetch_remote_config(repo_url, branch)
+        if remote_config and 'version' in remote_config:
+            remote_version = remote_config['version']
+            update_available, _ = is_remote_version_newer(current_version, remote_version)
+    except Exception as e:
+        current_app.logger.error(f"Error checking for updates in admin settings: {e}")
+    
+    return render_template('auth/admin_settings.html', 
+                          update_available=update_available,
+                          current_version=current_version)
 
 @bp.route('/admin/integrity')
 @admin_required

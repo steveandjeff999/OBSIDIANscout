@@ -1,5 +1,15 @@
 {
   "checksums": {
+    "app_config.json": {
+      "checksum": "412c6e9cef5cd2a49684937335d9006bcdfc6a241bdf17c0dab28a7b358677a7",
+      "modified": 1752010314.9354756,
+      "size": 172
+    },
+    "CREATE_RELEASE_INSTRUCTIONS.md": {
+      "checksum": "9a519f31241c4c78b57bdd60a78b759f5686373c060503e146a8c7f0d8935130",
+      "modified": 1752006548.0088096,
+      "size": 1117
+    },
     "DUAL_API_README.md": {
       "checksum": "2a9317cb54b91da475f8574824dacd20d5a2ad3d1485cdb07f89cdbac49c5484",
       "modified": 1751928754.0141585,
@@ -30,15 +40,35 @@
       "modified": 1751928754.0141585,
       "size": 3400
     },
+    "test_version.py": {
+      "checksum": "9acbe6ab3001c37674f743b1fc603ff779c125119133022e15a36935a30b27c3",
+      "modified": 1752005964.9667523,
+      "size": 1012
+    },
+    "update.bat": {
+      "checksum": "5d1e9f6023d9ff03862d25cd588fef978af81f0a7ce94c5874f5cdf61d715805",
+      "modified": 1751998387.31963,
+      "size": 687
+    },
+    "update.sh": {
+      "checksum": "994a7b1b4f4de90eb78c645d939940ffd8dd663cdb3956a914c0d8963b67f4f5",
+      "modified": 1751995233.852891,
+      "size": 405
+    },
+    "VERSION_MANAGEMENT.md": {
+      "checksum": "478da2d5c947178fb6a64575fc303d69d2f87aa0c1495485c8402b0c6c771567",
+      "modified": 1752006548.006819,
+      "size": 3502
+    },
     "app\\models.py": {
       "checksum": "e243c7fcfdb564c6ff891769d3e3626af76e920c1ef48d2a16585547ffeb7fac",
       "modified": 1751824368.4510295,
       "size": 38856
     },
     "app\\__init__.py": {
-      "checksum": "73d660de8a8231e445293aebe32df059e1c2f1aa3686e453cc163d9d080c3d12",
-      "modified": 1751935759.8044157,
-      "size": 7024
+      "checksum": "aa3d5c139c8f10a9c44b02345874fc4e33edba8d55a433819b925840a91bd34f",
+      "modified": 1751995233.8538985,
+      "size": 7107
     },
     "app\\assistant\\core.py": {
       "checksum": "ba2e6dd6df55a34003be5fd262cbc570b557361fc2b2622ee7315ddfbe35ed43",
@@ -60,6 +90,11 @@
       "modified": 1751411499.9548268,
       "size": 5795
     },
+    "app\\routes\\admin.py": {
+      "checksum": "133264da80facbb20147d8a9f42cf46a3d3ddfaf9e39f389f014617e5d781aca",
+      "modified": 1752007189.914939,
+      "size": 9338
+    },
     "app\\routes\\alliances.py": {
       "checksum": "3d20a18b3c08b6fa2cd2b478f81110d968668184ea64c0c436e7a662981eec1d",
       "modified": 1751943698.7950892,
@@ -76,9 +111,9 @@
       "size": 4051
     },
     "app\\routes\\auth.py": {
-      "checksum": "74219cbdb174968bb08508b7d122b08aef832c77c5d28c2d3f252e736b7a5fad",
-      "modified": 1751770861.2202835,
-      "size": 11478
+      "checksum": "f3ce977db8532f7cc513c9bdb2012faeed4c36517f3f1b56f143360361c64cd6",
+      "modified": 1752010257.4117866,
+      "size": 12586
     },
     "app\\routes\\data.py": {
       "checksum": "f119e462540e8643fb02a8a5c4150b5f59b33bc53ad550a329b8e6126f4db2ea",
@@ -102,7 +137,7 @@
     },
     "app\\routes\\main.py": {
       "checksum": "5f1038909f945e12ab1f3591237068dd71cd2ce89a7031fc09a7ca61e4c87fe8",
-      "modified": 1751941258.3927896,
+      "modified": 1752009302.2510016,
       "size": 16129
     },
     "app\\routes\\matches.py": {
@@ -241,14 +276,19 @@
       "size": 33459
     },
     "app\\templates\\index.html": {
-      "checksum": "12a30c0984830eda9fb5fe1d9453cb3810ff6b3d074a2abf2c4556fb7bddf828",
-      "modified": 1751944449.8916872,
-      "size": 13551
+      "checksum": "78b52f13714f6459f3d8e5adfbe353c175cb2c2dcb616c37ad199fe0ec183843",
+      "modified": 1752011772.666169,
+      "size": 14159
     },
     "app\\templates\\activity\\logs.html": {
       "checksum": "f5701661189d771dfd9fdba3cfc21ff0e36d244f0c19b7874a2d99cd8336d8e5",
       "modified": 1751459617.494209,
       "size": 11825
+    },
+    "app\\templates\\admin\\update.html": {
+      "checksum": "e998d67965366ac798918d9aa722a2ad6a15b24f2a8fe55c6012482332ccf727",
+      "modified": 1752003374.5859125,
+      "size": 14703
     },
     "app\\templates\\alliances\\index.html": {
       "checksum": "069c640f5fcbdf5ae1d4368e0ee698a55088bdae5a61427a8265c9567c07ec4e",
@@ -291,9 +331,9 @@
       "size": 6908
     },
     "app\\templates\\auth\\admin_settings.html": {
-      "checksum": "81f3884c17247d27a03d8dec978298bb2b5e28ad75ba1cc02b9708aded0fb3af",
-      "modified": 1751549115.5052593,
-      "size": 5046
+      "checksum": "d10fbf73acf4ce73af5580acfb3f66143efb8dd025cc5f02d45b4eb02827115c",
+      "modified": 1752010257.4384449,
+      "size": 6354
     },
     "app\\templates\\auth\\edit_user.html": {
       "checksum": "1554c8e7ae622d5f0ad14b87aaeaff49172b9942334eb74b98bac8abc22c47c7",
@@ -655,6 +695,11 @@
       "modified": 1751601296.1017802,
       "size": 8942
     },
+    "app\\utils\\remote_config.py": {
+      "checksum": "2c337a19e5082ecead8e6517ed6068d640b9c6c5be5a8f9a6b532146340d94d1",
+      "modified": 1752011411.0559175,
+      "size": 2509
+    },
     "app\\utils\\sync_manager.py": {
       "checksum": "654838a252aa27dcc268847b1530c1e097f3206b1f8b7316b64616d78b22f571",
       "modified": 1751839945.8119798,
@@ -675,10 +720,15 @@
       "modified": 1751553099.9745164,
       "size": 489
     },
+    "app\\utils\\version_manager.py": {
+      "checksum": "b7ac00e397224084640c7f5fc278f85ff7809e6dac2aade7ac8b8bc5f48786b3",
+      "modified": 1752006548.006819,
+      "size": 7512
+    },
     "app\\utils\\__init__.py": {
-      "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "modified": 1744952588.1103783,
-      "size": 0
+      "checksum": "b67066fec73d205d153582f514659cc0b77b36019395971d0e3ada02f8232fb9",
+      "modified": 1752007189.914939,
+      "size": 154
     },
     "config\\game_config_backup.json": {
       "checksum": "75f9b6ee1c2e77dea22800a2d6ad895ec51434844d1670ab08e5c048e57640ed",
@@ -861,5 +911,5 @@
       "size": 970
     }
   },
-  "created": "2025-07-08T10:26:02.406771"
+  "created": "2025-07-08T17:00:35.788010"
 }
