@@ -31,10 +31,14 @@ def check_for_updates():
     """Check for available updates"""
     version_manager = VersionManager()
     
-    # Try GitHub first, then fall back to git
+    # Try GitHub first (handles both releases and commits)
     has_update, message = version_manager.check_for_updates_github()
-    if not has_update and "Not a GitHub repository" in message:
-        has_update, message = version_manager.check_for_updates_git()
+    
+    # If GitHub check fails completely, fall back to local git
+    if "Error" in message and "Network error" not in message:
+        has_update, git_message = version_manager.check_for_updates_git()
+        if has_update:
+            message = git_message
     
     return jsonify({
         'update_available': has_update,
@@ -129,6 +133,25 @@ def run_update():
             # Log the result
             if return_code == 0:
                 yield f"data: Process completed with return code: {return_code}\n\n"
+                
+                # Update version information after successful update
+                try:
+                    version_manager = VersionManager()
+                    remote_version = version_manager.get_remote_version()
+                    if remote_version:
+                        # Extract version from remote_version (handle commit format)
+                        if '(' in remote_version:  # Format: "2025.07.08.1850 (0f36a88)"
+                            new_version = remote_version.split(' ')[0]
+                        else:
+                            new_version = remote_version
+                        version_manager.set_current_version(new_version)
+                        yield f"data: Updated version to {new_version}\n\n"
+                    else:
+                        version_manager.update_version_info(mark_updated=True)
+                        yield f"data: Marked update as completed\n\n"
+                except Exception as e:
+                    yield f"data: Warning: Could not update version info: {str(e)}\n\n"
+                
                 yield "event: end\ndata: success\n\n"
             else:
                 yield f"data: Process failed with return code: {return_code}\n\n"

@@ -1,8 +1,8 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.0",
     "last_updated": null,
-    "update_available": false,
-    "remote_version": null,
+    "update_available": true,
+    "remote_version": "2025.07.08.1850 (0f36a88)",
     "repository_url": "https://github.com/steveandjeff999/OBSIDIANscout",
     "branch": "main"
 }

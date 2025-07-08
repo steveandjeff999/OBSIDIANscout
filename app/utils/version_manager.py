@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 class VersionManager:
     def __init__(self, config_file='app_config.json'):
         self.config_file = config_file
-        self.config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), config_file)
+        # Always use the root directory for app_config.json
+        self.config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), config_file)
         self.config = self.load_config()
     
     def load_config(self):
@@ -73,38 +74,107 @@ class VersionManager:
             
             # Extract owner and repo from GitHub URL
             if 'github.com' in repo_url:
-                parts = repo_url.replace('.git', '').split('/')
-                owner = parts[-2]
-                repo = parts[-1]
+                # Handle different URL formats
+                repo_url = repo_url.replace('.git', '')
+                if repo_url.endswith('/'):
+                    repo_url = repo_url[:-1]
+                
+                parts = repo_url.split('/')
+                if len(parts) >= 2:
+                    owner = parts[-2]
+                    repo = parts[-1]
+                else:
+                    return False, "Invalid GitHub URL format"
                 
                 # Get latest release from GitHub API
                 api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
-                response = requests.get(api_url, timeout=10)
+                logger.info(f"Checking for updates at: {api_url}")
                 
-                if response.status_code == 200:
-                    release_data = response.json()
-                    remote_version = release_data['tag_name'].lstrip('v')
+                try:
+                    response = requests.get(api_url, timeout=10)
+                    logger.info(f"GitHub API response status: {response.status_code}")
                     
-                    current_version = self.get_current_version()
-                    
-                    # Compare versions
-                    if version.parse(remote_version) > version.parse(current_version):
-                        self.config['remote_version'] = remote_version
-                        self.config['update_available'] = True
-                        self.save_config()
-                        return True, f"Update available: {remote_version}"
+                    if response.status_code == 200:
+                        release_data = response.json()
+                        remote_version = release_data['tag_name'].lstrip('v')
+                        logger.info(f"Found remote version: {remote_version}")
+                        
+                        current_version = self.get_current_version()
+                        logger.info(f"Current version: {current_version}")
+                        
+                        # Compare versions
+                        try:
+                            if version.parse(remote_version) > version.parse(current_version):
+                                self.config['remote_version'] = remote_version
+                                self.config['update_available'] = True
+                                self.save_config()
+                                return True, f"Update available: {remote_version}"
+                            else:
+                                self.config['update_available'] = False
+                                self.config['remote_version'] = remote_version
+                                self.save_config()
+                                return False, f"No updates available (latest: {remote_version})"
+                        except Exception as ve:
+                            logger.error(f"Version comparison error: {ve}")
+                            return False, f"Error comparing versions: {str(ve)}"
+                    elif response.status_code == 404:
+                        # Try checking commits if no releases found
+                        return self.check_for_updates_git_api(owner, repo)
                     else:
-                        self.config['update_available'] = False
-                        self.config['remote_version'] = remote_version
-                        self.save_config()
-                        return False, "No updates available"
-                else:
-                    return False, f"Failed to check for updates: {response.status_code}"
+                        return False, f"GitHub API error: {response.status_code} - {response.text}"
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"Network error checking GitHub: {e}")
+                    return False, f"Network error: {str(e)}"
             else:
                 return False, "Not a GitHub repository"
         except Exception as e:
             logger.error(f"Error checking for updates: {e}")
             return False, f"Error checking for updates: {str(e)}"
+    
+    def check_for_updates_git_api(self, owner, repo):
+        """Check for updates using GitHub API for commits when no releases exist"""
+        try:
+            # Get latest commit from the specified branch
+            branch = self.config.get('branch', 'main')
+            api_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{branch}"
+            
+            response = requests.get(api_url, timeout=10)
+            if response.status_code == 200:
+                commit_data = response.json()
+                latest_commit_sha = commit_data['sha'][:7]  # Short SHA
+                commit_date = commit_data['commit']['committer']['date']
+                
+                # Use commit date as version indicator
+                from datetime import datetime
+                commit_datetime = datetime.fromisoformat(commit_date.replace('Z', '+00:00'))
+                version_string = commit_datetime.strftime("%Y.%m.%d.%H%M")
+                
+                current_version = self.get_current_version()
+                
+                # If current version is older format, consider update available
+                try:
+                    version.parse(current_version)
+                    # Current version is semantic, update available if commit is newer
+                    self.config['remote_version'] = f"{version_string} ({latest_commit_sha})"
+                    self.config['update_available'] = True
+                    self.save_config()
+                    return True, f"New commits available: {latest_commit_sha}"
+                except:
+                    # Current version might be commit-based too
+                    if current_version != version_string:
+                        self.config['remote_version'] = f"{version_string} ({latest_commit_sha})"
+                        self.config['update_available'] = True
+                        self.save_config()
+                        return True, f"New commits available: {latest_commit_sha}"
+                    else:
+                        self.config['update_available'] = False
+                        self.save_config()
+                        return False, "No new commits"
+            else:
+                return False, f"Could not check commits: {response.status_code}"
+        except Exception as e:
+            logger.error(f"Error checking git API: {e}")
+            return False, f"Error checking commits: {str(e)}"
     
     def check_for_updates_git(self):
         """Check for updates using git commands"""

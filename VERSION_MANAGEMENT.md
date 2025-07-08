@@ -37,15 +37,20 @@ To update the current version manually:
 
 ### Checking for Updates
 
-The system supports two methods for checking updates:
+The system supports multiple methods for checking updates, automatically falling back if needed:
 
-1. **GitHub Releases** (recommended): 
+1. **GitHub Releases** (preferred): 
    - Set `repository_url` to your GitHub repository
    - Create releases with version tags (e.g., `v1.0.1`)
-   - The system will compare with GitHub releases
+   - The system will compare with GitHub releases using semantic versioning
 
-2. **Git Commits**:
-   - If not a GitHub repo, checks for new commits on the specified branch
+2. **GitHub Commits** (automatic fallback):
+   - If no releases are found, checks for new commits on the specified branch
+   - Uses commit timestamps to generate version numbers (YYYY.MM.DD.HHMM format)
+   - Includes short commit SHA for identification
+
+3. **Local Git** (final fallback):
+   - If GitHub is unavailable, checks for new commits locally
    - Requires the project to be in a Git repository
 
 ### Admin Interface
@@ -53,9 +58,17 @@ The system supports two methods for checking updates:
 Access the update interface at `/admin/update`:
 
 - View current version information
-- Check for available updates
+- Check for available updates automatically
 - See update status (up to date / update available)
 - Perform updates with real-time console output
+- **Automatic version updating** after successful updates
+
+### Automatic Features
+
+- **Single Config File**: All version information stored in one `app_config.json` file
+- **Smart Update Detection**: Automatically detects GitHub releases or commits
+- **Version Auto-Update**: Updates version number automatically after successful updates
+- **Fallback Systems**: Multiple methods ensure update checking works in various environments
 
 ### API Endpoints
 
