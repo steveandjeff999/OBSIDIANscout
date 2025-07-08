@@ -119,7 +119,7 @@ def create_app(test_config=None):
     config_manager.init_app(app)
 
     # Import and register blueprints
-    from app.routes import main, teams, matches, scouting, data, visualization, graphs, events, alliances, auth, activity, assistant, integrity, pit_scouting
+    from app.routes import main, teams, matches, scouting, data, visualization, graphs, events, alliances, auth, activity, assistant, integrity, pit_scouting, admin
     
     # Register template filters
     from app.utils import template_filters
@@ -143,6 +143,9 @@ def create_app(test_config=None):
     # Register API test blueprint (admin only)
     from app.routes import api_test
     app.register_blueprint(api_test.bp)
+    
+    # Register admin blueprint
+    app.register_blueprint(admin.bp)
     
     # Create database tables (only if they don't exist)
     with app.app_context():
