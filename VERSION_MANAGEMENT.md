@@ -8,9 +8,8 @@ The version information is stored in `app_config.json` at the root of the projec
 
 ```json
 {
-    "version": "a46e099",
+    "version": "1.0.0.0",
     "last_updated": "2025-07-08T19:07:00",
-    "update_available": false,
     "repository_url": "https://github.com/yourusername/your-repo.git",
     "branch": "main"
 }
@@ -18,11 +17,31 @@ The version information is stored in `app_config.json` at the root of the projec
 
 ### Configuration Options
 
-- **version**: Current application version (semantic version for releases, commit SHA for development)
+- **version**: Your current application version (semantic versioning)
 - **last_updated**: ISO timestamp of last update
-- **update_available**: Boolean indicating if an update is available
 - **repository_url**: GitHub repository URL for checking releases
-- **branch**: Git branch to track for updates
+- **branch**: Git branch (used for future features)
+
+## How It Works
+
+This system uses **GitHub Releases only** for version management:
+
+1. **Your local version** stays exactly as you set it (e.g., `1.0.0.0`)
+2. **GitHub releases** are checked for newer versions using semantic versioning
+3. **Version comparison** uses the `packaging` library for accurate semantic version comparison
+4. **Automatic updates** download and install when a higher version is found
+
+### Creating Releases
+
+To enable version checking, create releases on your GitHub repository:
+
+1. Go to your GitHub repository
+2. Click "Releases" → "Create a new release"
+3. Tag version: `v1.0.0.1` (or `1.0.0.1`)
+4. Release title: `Version 1.0.0.1`
+5. Publish release
+
+The system will automatically detect when `1.0.0.1` > `1.0.0.0` and offer to update.
 
 ## Usage
 
@@ -35,21 +54,17 @@ To update the current version manually:
 
 ### Checking for Updates
 
-The system supports multiple methods for checking updates, automatically falling back if needed:
+The system uses a simple and reliable approach:
 
-1. **GitHub Releases** (preferred): 
-   - Set `repository_url` to your GitHub repository
-   - Create releases with version tags (e.g., `v1.0.1`)
-   - The system will compare with GitHub releases using semantic versioning
+1. **GitHub Releases Only**: 
+   - Checks your GitHub repository for published releases
+   - Compares release version tags with your local version
+   - Uses semantic versioning for accurate comparison (1.0.0.1 > 1.0.0.0)
 
-2. **GitHub Commits** (automatic fallback):
-   - If no releases are found, checks for new commits on the specified branch
-   - Compares commit SHAs directly for accurate version tracking
-   - Stores the short commit SHA (7 characters) as the version
-
-3. **Local Git** (final fallback):
-   - If GitHub is unavailable, checks for new commits locally
-   - Requires the project to be in a Git repository
+2. **No Commit Tracking**:
+   - Does not track individual commits
+   - Only responds to official releases you publish
+   - Clean and predictable update behavior
 
 ### Admin Interface
 

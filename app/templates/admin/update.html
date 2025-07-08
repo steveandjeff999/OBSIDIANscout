@@ -58,6 +58,11 @@
                                 {% endif %}
                             </div>
                         </div>
+                        <div class="row mt-2" id="latestVersionRow" style="display: none;">
+                            <div class="col-md-12">
+                                <small class="text-muted">Latest Version: <span id="latestVersionText"></span></small>
+                            </div>
+                        </div>
                         <div class="mt-3">
                             <button id="checkUpdatesBtn" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-search me-2"></i> Check for Updates
@@ -151,6 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.update_available) {
+                // Show latest version info
+                if (data.latest_version) {
+                    document.getElementById('latestVersionText').textContent = data.latest_version;
+                    document.getElementById('latestVersionRow').style.display = 'block';
+                }
                 location.reload(); // Reload to show updated status
             } else {
                 checkUpdatesBtn.innerHTML = '<i class="fas fa-check me-2"></i> Up to Date';

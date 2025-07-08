@@ -29,19 +29,14 @@ def check_for_updates():
     """Check for available updates"""
     version_manager = VersionManager()
     
-    # Try GitHub first (handles both releases and commits)
+    # Check GitHub releases only
     has_update, message = version_manager.check_for_updates_github()
-    
-    # If GitHub check fails completely, fall back to local git
-    if "Error" in message and "Network error" not in message:
-        has_update, git_message = version_manager.check_for_updates_git()
-        if has_update:
-            message = git_message
     
     return jsonify({
         'update_available': has_update,
         'message': message,
-        'current_version': version_manager.get_current_version()
+        'current_version': version_manager.get_current_version(),
+        'latest_version': version_manager.get_latest_release_version()
     })
 
 @bp.route('/update/run', methods=['GET', 'POST'])
@@ -134,9 +129,11 @@ def run_update():
                 # Update version information after successful update
                 try:
                     version_manager = VersionManager()
-                    # Just mark the update as completed - version was already updated during check
-                    version_manager.update_version_info(mark_updated=True)
-                    yield f"data: Marked update as completed\n\n"
+                    success, msg = version_manager.update_to_latest_version()
+                    if success:
+                        yield f"data: {msg}\n\n"
+                    else:
+                        yield f"data: Version update info: {msg}\n\n"
                 except Exception as e:
                     yield f"data: Warning: Could not update version info: {str(e)}\n\n"
                 
