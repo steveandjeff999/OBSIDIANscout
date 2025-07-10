@@ -141,8 +141,9 @@ if __name__ == '__main__':
             app,
             host='0.0.0.0',
             port=port,
-            debug=not IS_PRODUCTION,  # Enable debug only in local development
-            ssl_context=ssl_context
+            debug=not IS_PRODUCTION,
+            ssl_context=ssl_context,
+            allow_unsafe_werkzeug=True  # This line disables the production server error.
         )
     except KeyboardInterrupt:
         print("\nShutting down server...")
