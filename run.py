@@ -1,5 +1,4 @@
 import os
-import ssl
 import sys
 from app import create_app, socketio, db
 from flask import redirect, url_for, request, flash
@@ -36,6 +35,13 @@ def handle_operational_error(error):
     return redirect(url_for('main.index'))
 
 if __name__ == '__main__':
+    # Determine if running in a production environment (like Render)
+    # Render sets the 'RENDER' environment variable
+    IS_PRODUCTION = 'RENDER' in os.environ
+
+    # Get port from environment variables, fallback to 5000 for local dev
+    port = int(os.environ.get('PORT', 5000))
+
     # Initialize database first
     print("Starting FRC Scouting Platform...")
     with app.app_context():
@@ -71,86 +77,73 @@ if __name__ == '__main__':
         else:
             print("File integrity verified - all files are intact.")
     
-    # Check if SSL certificate files exist
-    cert_file = os.path.join(os.path.dirname(__file__), 'ssl', 'cert.pem')
-    key_file = os.path.join(os.path.dirname(__file__), 'ssl', 'key.pem')
-    
-    # Check if we have SSL certificates
-    use_ssl = os.path.exists(cert_file) and os.path.exists(key_file)
-    
-    if not use_ssl:
-        # Create directory for SSL certificates if it doesn't exist
-        ssl_dir = os.path.join(os.path.dirname(__file__), 'ssl')
-        if not os.path.exists(ssl_dir):
-            os.makedirs(ssl_dir)
-            
-        print("SSL certificates not found. Generating self-signed certificates...")
-        try:
-            # Try to generate self-signed certificates
-            from OpenSSL import crypto
-            
-            # Create a key pair
-            k = crypto.PKey()
-            k.generate_key(crypto.TYPE_RSA, 2048)
-            
-            # Create a self-signed certificate
-            cert = crypto.X509()
-            cert.get_subject().C = "US"
-            cert.get_subject().ST = "State"
-            cert.get_subject().L = "City"
-            cert.get_subject().O = "Team 5454"
-            cert.get_subject().OU = "Scouting App"
-            cert.get_subject().CN = "0.0.0.0"
-            cert.set_serial_number(1000)
-            cert.gmtime_adj_notBefore(0)
-            cert.gmtime_adj_notAfter(10*365*24*60*60)  # 10 years
-            cert.set_issuer(cert.get_subject())
-            cert.set_pubkey(k)
-            cert.sign(k, 'sha256')
-            
-            # Save the certificate and key
-            with open(cert_file, "wb") as cf:
-                cf.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
-            with open(key_file, "wb") as kf:
-                kf.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, k))
-                
-            use_ssl = True
-            print("Self-signed SSL certificates generated successfully.")
-            
-        except ImportError:
-            print("Warning: pyOpenSSL not installed. Unable to generate SSL certificates.")
-            print("To enable SSL, install pyOpenSSL or manually add cert.pem and key.pem to the ssl directory.")
-            print("Running in HTTP mode (camera features may not work in some browsers).")
-        except Exception as e:
-            print(f"Error generating SSL certificates: {e}")
-            print("Running in HTTP mode (camera features may not work in some browsers).")
-    
+    # For local development, we can use self-signed SSL. In production, Render handles SSL.
+    use_ssl = not IS_PRODUCTION
+    ssl_context = None
+
     if use_ssl:
-        print("Starting server with SSL support (HTTPS)...")
-        try:
-            socketio.run(
-                app, 
-                debug=True, 
-                host='0.0.0.0',
-                port=5000,
-                ssl_context=(cert_file, key_file),
-                allow_unsafe_werkzeug=True
-            )
-        except KeyboardInterrupt:
-            print("\nShutting down server...")
-            sys.exit(0)
+        cert_file = os.path.join(os.path.dirname(__file__), 'ssl', 'cert.pem')
+        key_file = os.path.join(os.path.dirname(__file__), 'ssl', 'key.pem')
+
+        if os.path.exists(cert_file) and os.path.exists(key_file):
+            ssl_context = (cert_file, key_file)
+        else:
+            # Create directory for SSL certificates if it doesn't exist
+            ssl_dir = os.path.join(os.path.dirname(__file__), 'ssl')
+            if not os.path.exists(ssl_dir):
+                os.makedirs(ssl_dir)
+                
+            print("SSL certificates not found. Generating self-signed certificates for local development...")
+            try:
+                from OpenSSL import crypto
+                
+                k = crypto.PKey()
+                k.generate_key(crypto.TYPE_RSA, 2048)
+                
+                cert = crypto.X509()
+                cert.get_subject().C = "US"
+                cert.get_subject().ST = "State"
+                cert.get_subject().L = "City"
+                cert.get_subject().O = "Team 5454"
+                cert.get_subject().OU = "Scouting App"
+                cert.get_subject().CN = "localhost"
+                cert.set_serial_number(1000)
+                cert.gmtime_adj_notBefore(0)
+                cert.gmtime_adj_notAfter(10*365*24*60*60)
+                cert.set_issuer(cert.get_subject())
+                cert.set_pubkey(k)
+                cert.sign(k, 'sha256')
+                
+                with open(cert_file, "wb") as cf:
+                    cf.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
+                with open(key_file, "wb") as kf:
+                    kf.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, k))
+                
+                ssl_context = (cert_file, key_file)
+                print("Self-signed SSL certificates generated successfully.")
+            except ImportError:
+                print("Warning: pyOpenSSL not installed. Cannot generate SSL certs.")
+                use_ssl = False
+            except Exception as e:
+                print(f"Error generating SSL certificates: {e}")
+                use_ssl = False
+
+    if IS_PRODUCTION:
+        print(f"Starting server in production mode on port {port} (HTTP)...")
+    elif use_ssl:
+        print("Starting server with SSL support (HTTPS) for local development...")
     else:
-        print("Starting server without SSL (HTTP)...")
+        print("Starting server without SSL (HTTP) for local development...")
         print("Warning: Camera access for QR scanning may not work without HTTPS.")
-        print("For development, access the application at http://localhost:5000")
-        try:
-            socketio.run(
-                app, 
-                debug=True, 
-                host='0.0.0.0',
-                port=5000,
-                allow_unsafe_werkzeug=True
-            )
-        except KeyboardInterrupt:
-            print("\nShutting down server...")
-            sys.exit(0)
+
+    try:
+        socketio.run(
+            app,
+            host='0.0.0.0',
+            port=port,
+            debug=not IS_PRODUCTION,  # Enable debug only in local development
+            ssl_context=ssl_context
+        )
+    except KeyboardInterrupt:
+        print("\nShutting down server...")
+        sys.exit(0)
